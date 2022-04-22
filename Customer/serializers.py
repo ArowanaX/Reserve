@@ -1,4 +1,4 @@
-from wsgiref import validate
+
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 
@@ -49,7 +49,7 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            phone=str(self.context["phone"]),
+            phone="0"+str(self.context["phone"]),
             email=validated_data['email']
         )
         user.save()

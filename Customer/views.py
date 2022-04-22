@@ -1,5 +1,4 @@
-from multiprocessing import context
-from click import pass_context
+
 from django.urls import reverse
 
 from django.shortcuts import redirect
@@ -34,10 +33,6 @@ class PhoneVerifi(generics.CreateAPIView):
 
             phone = str(serializer["phone"].value)
             cache.set(phone,uid,180)
-            Send_sms(phone,uid)
-            print(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;")
-            print(phone)
-            # return Response(serializer.data, status = status.HTTP_200_OK)
             return redirect(reverse('Customer:activate',kwargs={"phone":str(phone)}))
 
         else:
@@ -47,21 +42,14 @@ class Activate(generics.CreateAPIView,):
     queryset = User.objects.all()
     serializer_class = ActivateSerializer
 
-    # def get_context_data(self, *args, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     return context
 
     def post(self , request,*args, **kwargs):
 
         serializer = ActivateSerializer(data=request.data)
         if serializer.is_valid():
-            print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
             phone = "0"+str(self.kwargs["phone"])
-            print(phone)
             c_phone=cache.get(phone)
             code = str(serializer["activate_code"].value)
-            print(code)
-            print(c_phone)
             if code == c_phone:
                 return redirect(reverse('Customer:register',kwargs={"phone":phone}))
             else:
