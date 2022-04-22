@@ -17,7 +17,7 @@ from .models import User
 
 
 class PhoneSerializer(serializers.ModelSerializer):
-    phone = serializers.IntegerField()
+    phone = serializers.CharField()
     class Meta:
         model = User
         fields = ('phone',)
@@ -25,5 +25,32 @@ class PhoneSerializer(serializers.ModelSerializer):
             'phone': {'required': True},
         }
 
+class ActivateSerializer(serializers.ModelSerializer):
+    activate_code = serializers.CharField()
+    class Meta:
+        model = User
+        fields = ('activate_code',)
+        extra_kwargs = {
+            'activate_code': {'required': True},
+        }
+
+    
+
 class UserSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name','email')
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'email': {'required': True},
+        }
+    def create(self, validated_data):
+        user = User.objects.create(
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            phone=str(self.context["phone"]),
+            email=validated_data['email']
+        )
+        user.save()
+        return user
