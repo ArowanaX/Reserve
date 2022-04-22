@@ -65,6 +65,12 @@ class Register(generics.CreateAPIView):
         return context
 
 
+class Profile(generics.RetrieveUpdateAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'phone'
+
 
 
 
