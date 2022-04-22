@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+AUTH_USER_MODEL = "Customer.User"
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'Supplier',
     'Reservation',
 
-    'django_celery_results',
+    # 'django_celery_results',
     'rest_framework',
 ]
 
@@ -148,6 +148,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CACHES = {
+    'default': {
+        "BACKEND": "django_redis.cache.RedisCache",
+        'LOCATION': 'redis://127.0.0.1:6379',
+        
+        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient",},
+        
+    }}
+
+
+
 
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_TIMEZONE = "Asia/Tehran"
