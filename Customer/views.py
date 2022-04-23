@@ -1,14 +1,16 @@
 
+
 from django.urls import reverse
 
-from django.shortcuts import redirect
+from django.shortcuts import redirect,HttpResponse
 
 from django.core.cache import cache
+# from requests import request
 from rest_framework.response import Response
-
+from rest_framework.decorators import api_view
 from rest_framework import generics,status
 from rest_framework.views import APIView
-
+from django.contrib.auth import logout
 
 
 from .models import User
@@ -53,16 +55,20 @@ class Activate(generics.CreateAPIView,):
             if code == c_phone:
                 return redirect(reverse('Customer:register',kwargs={"phone":phone}))
             else:
-                return Response(serializer.errors,status=status.HTTP_226_IM_USED)
+                return Response(serializer.errors,status=status.h)
 
 class Register(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
     def get_serializer_context(self):
         context = super(Register, self).get_serializer_context()
         context.update({"phone": str(self.kwargs["phone"])})
+        context.update({"request": self.request})
         return context
+    
+def my_logout(request):
+    logout(request)
+    return HttpResponse("loged out...!!!")
 
 
 class Profile(generics.RetrieveUpdateAPIView):

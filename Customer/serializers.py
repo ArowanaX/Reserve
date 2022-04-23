@@ -1,9 +1,11 @@
 
+
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 
 import random
 from django.core.cache import cache
+# from requests import request
 
 
 from rest_framework import serializers
@@ -11,7 +13,7 @@ from rest_framework.validators import UniqueValidator
 
 from Customer.utils import Send_sms
 from django.shortcuts import redirect
-
+from django.contrib.auth import login
 
 from .models import User
 
@@ -53,4 +55,13 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email']
         )
         user.save()
+        
+        request = self.context["request"]
+        
+        try:
+            login(request,User.objects.get(phone="0"+str(self.context["phone"])))
+            
+        except:
+            print("cant find...!")
+        
         return user
