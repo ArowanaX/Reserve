@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PhoneVerifi,Activate,Register,Profile,my_logout
+from .views import PhoneVerifi,Activate,Register,Profile,my_logout,my_login
 
 app_name="Customer"
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path("register/<int:phone>", Register.as_view(), name="register"),
     path("profile/<str:phone>", Profile.as_view(), name="profile"),
     path("logout/", my_logout, name="logout"),
+    path("login/", my_login, name="login"),
     
 
 ]

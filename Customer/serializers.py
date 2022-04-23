@@ -13,7 +13,7 @@ from rest_framework.validators import UniqueValidator
 
 from Customer.utils import Send_sms
 from django.shortcuts import redirect
-from django.contrib.auth import login
+from django.contrib.auth import login,authenticate
 
 from .models import User
 
@@ -55,13 +55,13 @@ class UserSerializer(serializers.ModelSerializer):
             email=validated_data['email']
         )
         user.save()
-        
         request = self.context["request"]
+        # my_user = authenticate(request, phone="0"+str(self.context["phone"]))
         
         try:
-            login(request,User.objects.get(phone="0"+str(self.context["phone"])))
+            login(request,user)
+            return user 
             
         except:
             print("cant find...!")
-        
-        return user
+            return user

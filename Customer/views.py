@@ -5,12 +5,13 @@ from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 
 from django.core.cache import cache
+from requests import request
 # from requests import request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import generics,status
 from rest_framework.views import APIView
-from django.contrib.auth import logout
+from django.contrib.auth import logout,login
 
 
 from .models import User
@@ -66,9 +67,15 @@ class Register(generics.CreateAPIView):
         context.update({"request": self.request})
         return context
     
+def my_login(request):
+    login(request, User.objects.get(phone = "09120857673" ))
+
+    return HttpResponse("loged in!!!")
+
+
 def my_logout(request):
     logout(request)
-    return HttpResponse("loged out...!!!")
+    return HttpResponse("loged out!!!")
 
 
 class Profile(generics.RetrieveUpdateAPIView):
@@ -76,9 +83,6 @@ class Profile(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'phone'
-
-
-
 
 
         
