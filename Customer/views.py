@@ -68,7 +68,7 @@ class Register(generics.CreateAPIView):
         return context
     
 def my_login(request):
-    login(request, User.objects.get(phone = "09120857673" ))
+    login(request, User.objects.get(phone = "09120857671" ))
 
     return HttpResponse("loged in!!!")
 

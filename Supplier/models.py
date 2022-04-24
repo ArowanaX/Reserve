@@ -1,11 +1,20 @@
 from django.db import models
 from django.utils.translation import gettext as _
+from Customer.models import User
+from django.contrib.auth.models import AbstractUser
+from Customer.managers import CustomUserManager
 
 
 
-class Residence(models.Model):
+class Residence(User):
+    objects = CustomUserManager()
+
+    # class Meta:
+        # unique_together = ['name','user']
+        # default_related_name = 'residence_asb'
     #location = models.
-    name = models.CharField(max_length=20)
+    user = models.OneToOneField(User,primary_key=True,on_delete=models.CASCADE,related_name="ResidenceToUser")
+    name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
     address = models.TextField(verbose_name=_("address"))
     img = models.ImageField(upload_to="supplier/",null=True,blank=True)
     TYPE_CHOICES = (
@@ -19,18 +28,20 @@ class Residence(models.Model):
         ('lux', 'lux'),
         ('sh', 'Sports hall'),
     )
-    tag = models.CharField(max_length=10, choices = TAG_CHOICES)
+    tag = models.CharField(max_length=10, choices = TAG_CHOICES,null=True,blank=True)
     service_hours_start = models.IntegerField()
     service_hours_end = models.IntegerField()
     max_reserve = models.IntegerField()
-    detail = models.TextField(max_length=300)
+    detail = models.TextField(max_length=300,null=True,blank=True)
 
     def __str__(self):
         return self.name
-
+    class Meta:
+        db_table = 'residiance'
+        ordering = ('name',)
 
 class Room(models.Model):
-    residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="ResidenceRoom")
+    residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="Residence_Room")
     id = models.IntegerField(primary_key=True)
     room_img1 = models.ImageField(upload_to="supplier/",null=True,blank=True)
     room_img2 = models.ImageField(upload_to="supplier/",null=True,blank=True)
@@ -51,3 +62,5 @@ class Room(models.Model):
 
     # def __str__(self):
     #     return self.id
+    class Meta:
+        db_table = 'room'
