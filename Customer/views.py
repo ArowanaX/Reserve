@@ -14,12 +14,27 @@ from rest_framework.views import APIView
 from django.contrib.auth import logout,login
 
 
-from .models import User
-from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer
+from .models import User,Profile
+from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer,TypeSerializer
 import random
 from Customer.utils import Send_sms
 
 from Customer import serializers
+
+class UserType(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = TypeSerializer
+  
+    # def post(self , request,*args, **kwargs):
+
+    #     serializer = TypeSerializer(data=request.data)
+        
+    #     if serializer.is_valid():
+    #         return super().post(request, *args, **kwargs)
+    #     else:
+    #         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class PhoneVerifi(generics.CreateAPIView):
  
@@ -68,7 +83,7 @@ class Register(generics.CreateAPIView):
         return context
     
 def my_login(request):
-    login(request, User.objects.get(phone = "09120857671" ))
+    login(request, User.objects.get(phone = "09120857673" ))
 
     return HttpResponse("loged in!!!")
 

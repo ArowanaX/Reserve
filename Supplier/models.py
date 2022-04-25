@@ -1,19 +1,22 @@
 from django.db import models
 from django.utils.translation import gettext as _
-from Customer.models import User
-from django.contrib.auth.models import AbstractUser
-from Customer.managers import CustomUserManager
+from Customer.models import Profile
+# from django.contrib.auth.models import AbstractUser
+# from Customer.managers import CustomUserManager
 
 
 
-class Residence(User):
-    objects = CustomUserManager()
-
-    # class Meta:
-        # unique_together = ['name','user']
-        # default_related_name = 'residence_asb'
+class Residence(models.Model):
+    
+    USERNAME_FIELD = 'profile'
+    REQUIRED_FIELDS = []
+ 
+    username = None
+    is_authenticated = False
+    is_anonymous = False
+    is_active = True
     #location = models.
-    user = models.OneToOneField(User,primary_key=True,on_delete=models.CASCADE,related_name="ResidenceToUser")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True)
     name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
     address = models.TextField(verbose_name=_("address"))
     img = models.ImageField(upload_to="supplier/",null=True,blank=True)
@@ -36,9 +39,10 @@ class Residence(User):
 
     def __str__(self):
         return self.name
+        
     class Meta:
         db_table = 'residiance'
-        ordering = ('name',)
+        
 
 class Room(models.Model):
     residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="Residence_Room")

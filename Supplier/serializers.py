@@ -4,6 +4,7 @@ from .models import Residence
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import logout,login
 from django.contrib.auth import authenticate
+from Customer.models import Profile
 
 
 
@@ -15,11 +16,10 @@ class ResidenceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Residence
-        fields =  ('name', 'user','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','password','re_password')
+        fields =  ('name','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','password','re_password')
         # fields = '__all__'
         extra_kwargs = {
             'name': {'required': True},
-            'user': {'required': True},
             'address': {'required': True},
             # 'img': {'required': True},
             'type': {'required': True},
@@ -41,7 +41,7 @@ class ResidenceSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         residence = Residence.objects.create(
             name=validated_data['name'],
-            user=validated_data['user'],
+            profile=Profile.objects.latest('date_joined'),
             address=validated_data['address'],
             img=validated_data['img'],
             type=validated_data['type'],
@@ -51,7 +51,7 @@ class ResidenceSerializer(serializers.ModelSerializer):
             max_reserve=validated_data['max_reserve'],
             detail=validated_data['detail']
         )
-        residence.set_password(validated_data['password'])
+        residence.profile.set_password(validated_data['password'])
         residence.save()
 
         return residence
@@ -97,10 +97,10 @@ class ProfilSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Residence
-        fields =  ('name','user', 'address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','password')
+        fields =  ('name','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','password')
         extra_kwargs = {
             'name': {'required': True},
-            'user': {'required': True},
+            # 'profile': {'required': True},
             'address': {'required': True},
             # 'img': {'required': True},
             'type': {'required': True},

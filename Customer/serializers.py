@@ -15,8 +15,29 @@ from Customer.utils import Send_sms
 from django.shortcuts import redirect
 from django.contrib.auth import login,authenticate
 
-from .models import User
+from .models import User,Profile
 
+
+
+
+class TypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ("is_User","is_Residence")
+        extra_kwargs = {
+            # 'is_User':{'required': True},
+            # 'is_Residence': {'required': True},
+        }
+    # def create(self, validated_data):
+    #     profile = Profile.objects.create(
+            
+    #         # profile=validated_data['profile'],
+    #         is_User=validated_data['is_User'],
+    #         is_Residance=validated_data['is_Residance']
+    #     )
+    #     profile.save()
+    #     return profile
+        
 
 class PhoneSerializer(serializers.ModelSerializer):
     phone = serializers.CharField()
@@ -43,12 +64,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('first_name', 'last_name','email')
         extra_kwargs = {
+            # 'profile':{'required': True},
             'first_name': {'required': True},
             'last_name': {'required': True},
             'email': {'required': True},
         }
     def create(self, validated_data):
         user = User.objects.create(
+            profile=Profile.objects.latest('date_joined'),
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             phone="0"+str(self.context["phone"]),
@@ -56,12 +79,13 @@ class UserSerializer(serializers.ModelSerializer):
         )
         user.save()
         request = self.context["request"]
-        # my_user = authenticate(request, phone="0"+str(self.context["phone"]))
         
+    
         try:
             login(request,user)
+            print("end")
             return user 
-            
+
         except:
-            print("cant find...!")
+            print("cant log...!")
             return user
