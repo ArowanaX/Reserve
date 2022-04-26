@@ -1,40 +1,32 @@
-
-
 from django.urls import reverse
-
 from django.shortcuts import redirect,HttpResponse
-
 from django.core.cache import cache
-from requests import request
-# from requests import request
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import generics,status
-from rest_framework.views import APIView
 from django.contrib.auth import logout,login
 
+from rest_framework.response import Response
+from rest_framework import generics,status
 
-from .models import User,Profile
 from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer,TypeSerializer
+from .models import User,Profile
 import random
-from Customer.utils import Send_sms
 
-from Customer import serializers
+
+# from Customer.utils import Send_sms
+
+
+
+
+
+
+#-----------------------------------get type of user(user,Residence)--------------------
 
 class UserType(generics.CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = TypeSerializer
   
-    # def post(self , request,*args, **kwargs):
-
-    #     serializer = TypeSerializer(data=request.data)
-        
-    #     if serializer.is_valid():
-    #         return super().post(request, *args, **kwargs)
-    #     else:
-    #         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
+#------------------------------------set activation code and send sms----------------------
 
 class PhoneVerifi(generics.CreateAPIView):
  
@@ -56,6 +48,10 @@ class PhoneVerifi(generics.CreateAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+
+#-------------------------check activate code--------------------------------
+
 class Activate(generics.CreateAPIView,):
     queryset = User.objects.all()
     serializer_class = ActivateSerializer
@@ -73,6 +69,9 @@ class Activate(generics.CreateAPIView,):
             else:
                 return Response(serializer.errors,status=status.h)
 
+
+#-----------------------------------register user----------------------------
+
 class Register(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -82,6 +81,17 @@ class Register(generics.CreateAPIView):
         context.update({"request": self.request})
         return context
     
+#-------------------------------user profile set-----------------------------
+
+class Profile(generics.RetrieveUpdateAPIView):
+
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'phone'
+
+
+#-----------------------------------just for develop test-----------------------
+
 def my_login(request):
     login(request, User.objects.get(phone = "09120857673" ))
 
@@ -91,14 +101,3 @@ def my_login(request):
 def my_logout(request):
     logout(request)
     return HttpResponse("loged out!!!")
-
-
-class Profile(generics.RetrieveUpdateAPIView):
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'phone'
-
-
-        
-

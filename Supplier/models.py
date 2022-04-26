@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext as _
+
+
 from Customer.models import Profile
-# from django.contrib.auth.models import AbstractUser
-# from Customer.managers import CustomUserManager
 
 
+#---------------------------------Residence(hotel)----------------------
 
 class Residence(models.Model):
     
@@ -16,8 +17,9 @@ class Residence(models.Model):
     is_anonymous = False
     is_active = True
     #location = models.
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True)
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True,related_name="residenceTOprofile")
     name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
+    last_login = models.CharField(max_length=300,null=True,blank=True)
     address = models.TextField(verbose_name=_("address"))
     img = models.ImageField(upload_to="supplier/",null=True,blank=True)
     TYPE_CHOICES = (
@@ -44,6 +46,9 @@ class Residence(models.Model):
         db_table = 'residiance'
         
 
+
+#-------------------------------------Room & service card--------------------
+
 class Room(models.Model):
     residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="Residence_Room")
     id = models.IntegerField(primary_key=True)
@@ -64,7 +69,5 @@ class Room(models.Model):
     faciliti = models.CharField(max_length=10, choices = FACILITI_CHOICES)
     price = models.BigIntegerField()
 
-    # def __str__(self):
-    #     return self.id
     class Meta:
         db_table = 'room'

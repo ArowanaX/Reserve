@@ -1,23 +1,24 @@
-from requests import Response
-from rest_framework import serializers
-from .models import Residence
 from django.contrib.auth.password_validation import validate_password
-from django.contrib.auth import logout,login
-from django.contrib.auth import authenticate
+
+
+from rest_framework import serializers
+
+
+from .models import Residence
 from Customer.models import Profile
 
+
+#-----------------------------------residence register & validator-------------
 
 
 class ResidenceSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     re_password = serializers.CharField(write_only=True, required=True)
     
-  
-
     class Meta:
         model = Residence
         fields =  ('name','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','password','re_password')
-        # fields = '__all__'
+        
         extra_kwargs = {
             'name': {'required': True},
             'address': {'required': True},
@@ -31,6 +32,7 @@ class ResidenceSerializer(serializers.ModelSerializer):
             'password': {'required': True},
             're_password': {'required': True},
         }
+
 
     def validate(self, attrs):
         if attrs['password'] != attrs['re_password']:
@@ -57,6 +59,8 @@ class ResidenceSerializer(serializers.ModelSerializer):
         return residence
     
 
+#--------------------------------------residence login with password & name---------------
+
 class LoginSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     class Meta:
@@ -66,32 +70,10 @@ class LoginSerializer(serializers.ModelSerializer):
             'name': {'required': True},
             'password': {'required': True},
             }
-    # def update(self, instance, validated_data):
-    #     print("baz hello")
-    #     # residence = Residence.objects.get(
-    #     #     name=validated_data['name'],
-    #     # )
-    #     residence=authenticate(name=validated_data['name'],password=validated_data['password'])
-    #     print(residence)
-    #     request = self.context["request"]
-    #     print(request)
-    #     try:
-    #         login(request, residence)
-    #     except:
-    #         print("cant...")
-    #     return super().update(instance, validated_data)
-    # def create(self, validated_data):
-    #     print("hello")
-    #     residence=authenticate(name=validated_data['name'],password=validated_data['password'])
+    
 
-    #     print(residence)
-    #     request = self.context["request"]
-    #     print(request)
-    #     try:
-    #         login(request, residence)
-    #     except:
-    #         print("cant...")
-    #     return None
+#---------------------------residence show & edit acconts----------------------------
+
 class ProfilSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     

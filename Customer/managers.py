@@ -1,9 +1,9 @@
-# from django.utils.translation import ugettext as _
-
-import email
 from django.contrib.auth.base_user import BaseUserManager
-from pkg_resources import require
 
+
+
+
+#---------------------------------manager of create user---------------------------- 
 
 class CustomUserManager(BaseUserManager):
    
@@ -14,6 +14,7 @@ class CustomUserManager(BaseUserManager):
             user.save()
             print("user....")
             return user
+
 
     def create_superuser(self, email, password, **extra_fields):
        

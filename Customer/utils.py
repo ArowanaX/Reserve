@@ -1,6 +1,8 @@
-
 from kavenegar import *
 
+
+
+#------------------------------------send sms activation code--------------------------------
 
 def Send_sms(to_phone,uid):
 
