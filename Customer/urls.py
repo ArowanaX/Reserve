@@ -21,6 +21,4 @@ urlpatterns = [
 #----------------------------just for develop test-----------------------
     path("logout/", my_logout, name="logout"),
     path("login/", my_login, name="login"),
-    
-
 ]

@@ -1,3 +1,4 @@
+import email
 from django.db import models
 from django.utils.translation import gettext as _
 
@@ -5,6 +6,7 @@ from django.utils.translation import gettext as _
 from Customer.models import Profile
 
 
+    
 #---------------------------------Residence(hotel)----------------------
 
 class Residence(models.Model):
@@ -21,7 +23,8 @@ class Residence(models.Model):
     name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
     last_login = models.CharField(max_length=300,null=True,blank=True)
     address = models.TextField(verbose_name=_("address"))
-    img = models.ImageField(upload_to="supplier/",null=True,blank=True)
+    city = models.CharField(max_length=20,null=False,blank=False)
+    img = models.ImageField(upload_to="supplier/",null=True, blank=True)
     TYPE_CHOICES = (
         ('lux', 'lux hotel'),
         ('h', 'hotel'),
@@ -38,6 +41,9 @@ class Residence(models.Model):
     service_hours_end = models.IntegerField()
     max_reserve = models.IntegerField()
     detail = models.TextField(max_length=300,null=True,blank=True)
+    email =models.EmailField('email address')
+    phone = models.CharField(max_length=12,unique=True,verbose_name="phone")
+
 
     def __str__(self):
         return self.name
@@ -45,17 +51,26 @@ class Residence(models.Model):
     class Meta:
         db_table = 'residiance'
         
+#----------------------------Album of outdoor & indoor------------------------
+class ResidenceOutdoorAlbum(models.Model):
+    residence=models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="outdootTOresident")
+    img_outdoor=models.ImageField(upload_to="outdoor/",null=True, blank=True)
+
+class ResidenceIndoorAlbum(models.Model):
+    residence=models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="indootTOresident")
+    img_indoor=models.ImageField(upload_to="indoor/",null=True, blank=True)
 
 
-#-------------------------------------Room & service card--------------------
 
-class Room(models.Model):
-    residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="Residence_Room")
+#------------------------------------- service card--------------------
+
+class Service(models.Model):
+    residence = models.ForeignKey(Residence,on_delete=models.CASCADE,related_name="serviceTOroom")
     id = models.IntegerField(primary_key=True)
-    room_img1 = models.ImageField(upload_to="supplier/",null=True,blank=True)
-    room_img2 = models.ImageField(upload_to="supplier/",null=True,blank=True)
-    room_img3 = models.ImageField(upload_to="supplier/",null=True,blank=True)
-    numberـofـbed = models.IntegerField()
+    title = models.CharField(max_length=30,null=False,blank=False)
+    # room_img1 = models.ImageField(upload_to="supplier/",null=True,blank=True)
+    # room_img2 = models.ImageField(upload_to="supplier/",null=True,blank=True)
+    # room_img3 = models.ImageField(upload_to="supplier/",null=True,blank=True)
     STATE_CHOICES = (
         ('F', 'Full'),
         ('E', 'Empty'),
@@ -67,7 +82,14 @@ class Room(models.Model):
         ('so', 'Sofa'),
     )
     faciliti = models.CharField(max_length=10, choices = FACILITI_CHOICES)
-    price = models.BigIntegerField()
+    # price = models.BigIntegerField()
 
     class Meta:
-        db_table = 'room'
+        db_table = 'service'
+
+#---------------------------food menu----------------------------------
+class RestaurantMenu(models.Model):
+    title = models.CharField(max_length=30,null=False,blank=False)
+    describtion = models.TextField(null=True,blank=True)
+    price = models.FloatField(null=True,blank=True)
+    service = models.ForeignKey(Service,on_delete=models.CASCADE,related_name="menuTOservice")
