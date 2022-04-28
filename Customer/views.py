@@ -2,6 +2,7 @@ from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
 from django.contrib.auth import logout,login
+import os
 
 from rest_framework.response import Response
 from rest_framework import generics,status
@@ -13,7 +14,10 @@ import random
 
 # from Customer.utils import Send_sms
 
+from dotenv import load_dotenv, find_dotenv
 
+# env_file = Path(find_dotenv(usecwd=True))
+# load_dotenv(verbose=True, dotenv_path=env_file)
 
 
 
@@ -67,7 +71,7 @@ class Activate(generics.CreateAPIView,):
             if code == c_phone:
                 return redirect(reverse('Customer:register',kwargs={"phone":phone}))
             else:
-                return Response(serializer.errors,status=status.h)
+                return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
 
 
 #-----------------------------------register user----------------------------
@@ -101,3 +105,4 @@ def my_login(request):
 def my_logout(request):
     logout(request)
     return HttpResponse("loged out!!!")
+

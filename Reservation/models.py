@@ -1,6 +1,6 @@
 from django.db import models
 from Customer.models import User
-from Supplier.models import Room
+from Supplier.models import Service
 
 
 
@@ -9,7 +9,7 @@ class Reserve(models.Model):
     date_in = models.DateField()
     date_out = models.DateField()
     person_num = models.IntegerField()
-    room = models.OneToOneField(Room,on_delete=models.CASCADE,related_name='ReserveRoom')
+    room = models.OneToOneField(Service,on_delete=models.CASCADE,related_name='ReserveRoom')
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='ReserveUser')
 
     def __str__(self):

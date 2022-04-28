@@ -82,7 +82,7 @@ class UserSerializer(serializers.ModelSerializer):
     
         try:
             login(request,user)
-            print("user loged is....!")
+            print("user loged in....!")
             return user 
 
         except:
