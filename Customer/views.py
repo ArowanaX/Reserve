@@ -34,12 +34,13 @@ class UserType(generics.CreateAPIView):
 
 class PhoneVerifi(generics.CreateAPIView):
  
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = PhoneSerializer
 
     def post(self , request):
         serializer = PhoneSerializer(data=request.data)
-        uid=str(random.randint(100000,999999))
+        # uid=str(random.randint(100000,999999))
+        uid=str(random.randint(1,9))
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+uid+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         
 
@@ -57,7 +58,7 @@ class PhoneVerifi(generics.CreateAPIView):
 #-------------------------check activate code--------------------------------
 
 class Activate(generics.CreateAPIView,):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = ActivateSerializer
 
 
@@ -77,7 +78,7 @@ class Activate(generics.CreateAPIView,):
 #-----------------------------------register user----------------------------
 
 class Register(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = UserSerializer
     def get_serializer_context(self):
         context = super(Register, self).get_serializer_context()
@@ -89,7 +90,7 @@ class Register(generics.CreateAPIView):
 
 class Profile(generics.RetrieveUpdateAPIView):
 
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'phone'
 

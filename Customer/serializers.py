@@ -1,7 +1,7 @@
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.contrib.auth import login
+from django.contrib.auth import login , authenticate
 
 
 from rest_framework import serializers
@@ -34,7 +34,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class PhoneSerializer(serializers.ModelSerializer):
     phone = serializers.CharField()
     class Meta:
-        model = User
+        model = Profile
         fields = ('phone',)
         extra_kwargs = {
             'phone': {'required': True},
@@ -46,7 +46,7 @@ class PhoneSerializer(serializers.ModelSerializer):
 class ActivateSerializer(serializers.ModelSerializer):
     activate_code = serializers.CharField()
     class Meta:
-        model = User
+        model = Profile
         fields = ('activate_code',)
         extra_kwargs = {
             'activate_code': {'required': True},
@@ -58,7 +58,7 @@ class ActivateSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Profile
         fields = ('first_name', 'last_name','email')
         extra_kwargs = {
             'first_name': {'required': True},
@@ -66,19 +66,22 @@ class UserSerializer(serializers.ModelSerializer):
             'email': {'required': True},
         }
     def create(self, validated_data):
-        user = User.objects.create(
-            profile=Profile.objects.latest('date_joined'),
+        user = Profile.objects.create(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            phone="0"+str(self.context["phone"]),
+            userTOprofile= User.objects.create(
+                phone="0"+str(self.context["phone"]),
+                profile= Profile.objects.latest('date_joined')
+            ),
             email=validated_data['email']
         )
+        phone="0"+str(self.context["phone"])
+        user.set_password(phone)
         user.save()
+        profile=Profile.objects.latest('date_joined').id
         request = self.context["request"]
+        user=authenticate(request,id=profile,password=phone)
         
-
-
-#--------------------------------------- just for test in develop-----------------------
     
         try:
             login(request,user)
