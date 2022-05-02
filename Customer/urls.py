@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import PhoneVerifi,Activate,Register,Profile,my_logout,my_login
+from .views import *
 
 app_name="Customer"
 
@@ -15,7 +15,7 @@ urlpatterns = [
 
 #-----------------------------show user dashboard---------------------------------
 
-    path("profile/<str:phone>", Profile.as_view(), name="profile"),
+    path("accont/", UserAccontAPI.as_view(), name="profile"),
 
 
 #----------------------------just for develop test-----------------------

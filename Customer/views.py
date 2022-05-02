@@ -1,14 +1,18 @@
+# from urllib import request
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
 from django.contrib.auth import logout,login
+from django.contrib.auth.decorators import login_required
 import os
+from requests import request
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics,status
 
-from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer,TypeSerializer
-from .models import User,Profile
+from .serializers import *
+from .models import *
 import random
 
 
@@ -88,12 +92,30 @@ class Register(generics.CreateAPIView):
     
 #-------------------------------user profile set-----------------------------
 
-class Profile(generics.RetrieveUpdateAPIView):
-
+class UserAccontAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Profile.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'phone'
+    serializer_class = AccontSerializer
+    # lookup_field = 'phone'
+    def get(self, request):
+        serializer = AccontSerializer(request.user)
+        return Response(serializer.data)
+    
+    def get_serializer_context(self):
+        context = super(UserAccontAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
 
+
+
+class MYUserAccontAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all()
+    serializer_class = UserAccontSerializer
+    # lookup_field = 'phone'
+    def get(self, request):
+        serializer = UserAccontSerializer(request.user)
+        return Response(serializer.data)
 
 #-----------------------------------just for develop test-----------------------
 

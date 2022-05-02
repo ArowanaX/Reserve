@@ -36,10 +36,10 @@ class User(models.Model):
     # is_anonymous = False
     is_active = True
     # last_login = models.CharField(max_length=300,null=True,blank=True)
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True,related_name="userTOprofile")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=True,null=True,blank=True,related_name="userTOprofile")
     # first_name = models.CharField(max_length=20,null=True,blank=True)
     # last_name = models.CharField(max_length=30,null=True,blank=True)
-    phone = models.CharField(max_length=12,unique=True,verbose_name="phone")
+    phone = models.CharField(max_length=12,primary_key=True,verbose_name="phone")
     # email = models.EmailField(unique=True,blank=True,null=True)
     point = models.IntegerField(default=0)
    

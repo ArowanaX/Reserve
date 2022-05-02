@@ -1,9 +1,12 @@
+import profile
+from wsgiref.validate import validator
 from django.utils.translation import gettext as _
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.contrib.auth import login , authenticate
-
-
+from requests import request
+from rest_framework.utils.field_mapping import get_nested_relation_kwargs
+from rest_framework.validators import UniqueValidator
 from rest_framework import serializers
 
 
@@ -69,15 +72,15 @@ class UserSerializer(serializers.ModelSerializer):
         user = Profile.objects.create(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
-            userTOprofile= User.objects.create(
-                phone="0"+str(self.context["phone"]),
-                profile= Profile.objects.latest('date_joined')
-            ),
             email=validated_data['email']
         )
         phone="0"+str(self.context["phone"])
         user.set_password(phone)
         user.save()
+        user.userTOprofile= User.objects.create(
+                phone="0"+str(self.context["phone"]),
+                profile= user
+            )
         profile=Profile.objects.latest('date_joined').id
         request = self.context["request"]
         user=authenticate(request,id=profile,password=phone)
@@ -91,3 +94,36 @@ class UserSerializer(serializers.ModelSerializer):
         except:
             print("cant log...!")
             return user
+
+
+class UserAccontSerializer(serializers.ModelSerializer):
+ 
+    class Meta:
+        model = User
+        fields = ('phone', 'point')
+        extra_kwargs = {
+            'phone': {'read_only': False},
+            'point': {'read_only': False},
+            
+        }
+
+class AccontSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields =  ('first_name','last_name','email','userTOprofile')
+        extra_kwargs = {
+            'last_name': {'read_only': False},
+            'email': {'read_only': True},
+            'userTOprofile': {'read_only': False},
+        }
+        depth = 1
+        
+    def build_nested_field(self, field_name, relation_info, nested_depth):
+       
+        if field_name == 'userTOprofile': 
+            field_class = UserAccontSerializer
+            field_kwargs = get_nested_relation_kwargs(relation_info)
+            return field_class, field_kwargs
+        return super().build_nested_field(field_name, relation_info, nested_depth)
+  
+  
