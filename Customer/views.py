@@ -1,4 +1,5 @@
 # from urllib import request
+from genericpath import exists
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
@@ -74,7 +75,14 @@ class Activate(generics.CreateAPIView,):
             c_phone=cache.get(phone)
             code = str(serializer["activate_code"].value)
             if code == c_phone:
-                return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+
+                if phone is not exists:
+                    return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+                elif phone is exists:
+                    return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
+                else:
+                    return Response(serializer.errors,status=status.HTTP_410_GONE)
+    
             else:
                 return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
 
@@ -96,7 +104,6 @@ class UserAccontAPI(generics.RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Profile.objects.all()
     serializer_class = AccontSerializer
-    # lookup_field = 'phone'
     def get(self, request):
         serializer = AccontSerializer(request.user)
         return Response(serializer.data)
@@ -106,16 +113,6 @@ class UserAccontAPI(generics.RetrieveUpdateAPIView):
         context.update({"request": self.request.user})
         return context
 
-
-
-class MYUserAccontAPI(generics.RetrieveUpdateAPIView):
-    permission_classes = (IsAuthenticated,)
-    queryset = User.objects.all()
-    serializer_class = UserAccontSerializer
-    # lookup_field = 'phone'
-    def get(self, request):
-        serializer = UserAccontSerializer(request.user)
-        return Response(serializer.data)
 
 #-----------------------------------just for develop test-----------------------
 
@@ -129,3 +126,13 @@ def my_logout(request):
     logout(request)
     return HttpResponse("loged out!!!")
 
+
+class RecoverUserAPI(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = RecoverSerializer
+    lookup_field = 'phone'
+    def get_serializer_context(self):
+        context = super(RecoverUserAPI, self).get_serializer_context()
+        context.update({"phone": str(self.kwargs["phone"])})
+        context.update({"request": self.request})
+        return context

@@ -125,5 +125,17 @@ class AccontSerializer(serializers.ModelSerializer):
             field_kwargs = get_nested_relation_kwargs(relation_info)
             return field_class, field_kwargs
         return super().build_nested_field(field_name, relation_info, nested_depth)
-  
-  
+
+
+
+class RecoverSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('first_name', 'last_name','email')
+        extra_kwargs = {
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'email': {'required': True},
+        }
+    def create(self, validated_data):
+        pass
