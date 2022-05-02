@@ -1,14 +1,19 @@
+# from urllib import request
+from genericpath import exists
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
 from django.contrib.auth import logout,login
+from django.contrib.auth.decorators import login_required
 import os
+from requests import request
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics,status
 
-from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer,TypeSerializer
-from .models import User,Profile
+from .serializers import *
+from .models import *
 import random
 
 
@@ -34,12 +39,13 @@ class UserType(generics.CreateAPIView):
 
 class PhoneVerifi(generics.CreateAPIView):
  
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = PhoneSerializer
 
     def post(self , request):
         serializer = PhoneSerializer(data=request.data)
-        uid=str(random.randint(100000,999999))
+        # uid=str(random.randint(100000,999999))
+        uid=str(random.randint(1,9))
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+uid+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
         
 
@@ -57,7 +63,7 @@ class PhoneVerifi(generics.CreateAPIView):
 #-------------------------check activate code--------------------------------
 
 class Activate(generics.CreateAPIView,):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = ActivateSerializer
 
 
@@ -69,7 +75,14 @@ class Activate(generics.CreateAPIView,):
             c_phone=cache.get(phone)
             code = str(serializer["activate_code"].value)
             if code == c_phone:
-                return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+
+                if phone is not exists:
+                    return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+                elif phone is exists:
+                    return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
+                else:
+                    return Response(serializer.errors,status=status.HTTP_410_GONE)
+    
             else:
                 return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
 
@@ -77,7 +90,7 @@ class Activate(generics.CreateAPIView,):
 #-----------------------------------register user----------------------------
 
 class Register(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = UserSerializer
     def get_serializer_context(self):
         context = super(Register, self).get_serializer_context()
@@ -87,11 +100,18 @@ class Register(generics.CreateAPIView):
     
 #-------------------------------user profile set-----------------------------
 
-class Profile(generics.RetrieveUpdateAPIView):
-
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'phone'
+class UserAccontAPI(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Profile.objects.all()
+    serializer_class = AccontSerializer
+    def get(self, request):
+        serializer = AccontSerializer(request.user)
+        return Response(serializer.data)
+    
+    def get_serializer_context(self):
+        context = super(UserAccontAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
 
 
 #-----------------------------------just for develop test-----------------------
@@ -106,3 +126,13 @@ def my_logout(request):
     logout(request)
     return HttpResponse("loged out!!!")
 
+
+class RecoverUserAPI(generics.RetrieveAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = RecoverSerializer
+    lookup_field = 'phone'
+    def get_serializer_context(self):
+        context = super(RecoverUserAPI, self).get_serializer_context()
+        context.update({"phone": str(self.kwargs["phone"])})
+        context.update({"request": self.request})
+        return context
