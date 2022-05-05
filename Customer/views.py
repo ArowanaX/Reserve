@@ -1,23 +1,21 @@
+
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
 from django.contrib.auth import logout,login
-import os
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics,status
 
-from .serializers import UserSerializer,PhoneSerializer,ActivateSerializer,TypeSerializer
-from .models import User,Profile
+from Customer.utils import Send_sms
+
+from .serializers import *
+from .models import *
 import random
 
 
-# from Customer.utils import Send_sms
 
-from dotenv import load_dotenv, find_dotenv
-
-# env_file = Path(find_dotenv(usecwd=True))
-# load_dotenv(verbose=True, dotenv_path=env_file)
 
 
 
@@ -34,18 +32,20 @@ class UserType(generics.CreateAPIView):
 
 class PhoneVerifi(generics.CreateAPIView):
  
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = PhoneSerializer
 
     def post(self , request):
         serializer = PhoneSerializer(data=request.data)
-        uid=str(random.randint(100000,999999))
+        # uid=str(random.randint(100000,999999))
+        uid=str(random.randint(1,9))
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+uid+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        
+        opt="validate_code"
 
         if serializer.is_valid():
 
             phone = str(serializer["phone"].value)
+            Send_sms(phone,uid,opt)
             cache.set(phone,uid,180)
             return redirect(reverse('Customer:activate',kwargs={"phone":str(phone)}))
 
@@ -57,7 +57,7 @@ class PhoneVerifi(generics.CreateAPIView):
 #-------------------------check activate code--------------------------------
 
 class Activate(generics.CreateAPIView,):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = ActivateSerializer
 
 
@@ -69,7 +69,15 @@ class Activate(generics.CreateAPIView,):
             c_phone=cache.get(phone)
             code = str(serializer["activate_code"].value)
             if code == c_phone:
-                return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+
+                if not Profile.objects.filter(userTOprofile=phone).exists():
+                    return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+                elif Profile.objects.filter(userTOprofile=phone).exists():
+
+                    return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
+                else:
+                    return Response(serializer.errors,status=status.HTTP_410_GONE)
+    
             else:
                 return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
 
@@ -77,7 +85,7 @@ class Activate(generics.CreateAPIView,):
 #-----------------------------------register user----------------------------
 
 class Register(generics.CreateAPIView):
-    queryset = User.objects.all()
+    queryset = Profile.objects.all()
     serializer_class = UserSerializer
     def get_serializer_context(self):
         context = super(Register, self).get_serializer_context()
@@ -87,11 +95,36 @@ class Register(generics.CreateAPIView):
     
 #-------------------------------user profile set-----------------------------
 
-class Profile(generics.RetrieveUpdateAPIView):
+class UserAccontAPI(generics.UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset = Profile.objects.all()
+    serializer_class = AccontSerializer
+    
+    def get(self, request):
+        serializer = AccontSerializer(request.user)
+        return Response(serializer.data)
 
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'phone'
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = request.user
+        print(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        print("oodafez")
+        serializer.is_valid(raise_exception=True)
+        print("salam")
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
+    
+    def get_serializer_context(self):
+        context = super(UserAccontAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
 
 
 #-----------------------------------just for develop test-----------------------
@@ -106,3 +139,14 @@ def my_logout(request):
     logout(request)
     return HttpResponse("loged out!!!")
 
+
+class RecoverUserAPI(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    
+    # queryset=Profile.objects.get(userTOprofile=ph)
+    serializer_class = RecoverSerializer
+    def get_serializer_context(self):
+        context = super(RecoverUserAPI, self).get_serializer_context()
+        context.update({"phone": str(self.kwargs["phone"])})
+        context.update({"request": self.request})
+        return context

@@ -15,13 +15,13 @@ class Residence(models.Model):
     REQUIRED_FIELDS = []
  
     username = None
-    is_authenticated = False
-    is_anonymous = False
+    # is_authenticated = False
+    # is_anonymous = False
     is_active = True
     #location = models.
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True,related_name="residenceTOprofile")
     name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
-    last_login = models.CharField(max_length=300,null=True,blank=True)
+    # last_login = models.CharField(max_length=300,null=True,blank=True)
     address = models.TextField(verbose_name=_("address"))
     city = models.CharField(max_length=20,null=False,blank=False)
     img = models.ImageField(upload_to="supplier/",null=True, blank=True)
@@ -41,7 +41,7 @@ class Residence(models.Model):
     service_hours_end = models.IntegerField()
     max_reserve = models.IntegerField()
     detail = models.TextField(max_length=300,null=True,blank=True)
-    email =models.EmailField('email address')
+    # email =models.EmailField('email address')
     phone = models.CharField(max_length=12,unique=True,verbose_name="phone")
 
 
