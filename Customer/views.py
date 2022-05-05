@@ -1,28 +1,21 @@
-# from urllib import request
-from genericpath import exists
+
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from django.core.cache import cache
 from django.contrib.auth import logout,login
-from django.contrib.auth.decorators import login_required
-import os
-from requests import request
 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics,status
+
+from Customer.utils import Send_sms
 
 from .serializers import *
 from .models import *
 import random
 
 
-# from Customer.utils import Send_sms
 
-from dotenv import load_dotenv, find_dotenv
-
-# env_file = Path(find_dotenv(usecwd=True))
-# load_dotenv(verbose=True, dotenv_path=env_file)
 
 
 
@@ -47,11 +40,12 @@ class PhoneVerifi(generics.CreateAPIView):
         # uid=str(random.randint(100000,999999))
         uid=str(random.randint(1,9))
         print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+uid+">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        
+        opt="validate_code"
 
         if serializer.is_valid():
 
             phone = str(serializer["phone"].value)
+            Send_sms(phone,uid,opt)
             cache.set(phone,uid,180)
             return redirect(reverse('Customer:activate',kwargs={"phone":str(phone)}))
 
@@ -76,9 +70,10 @@ class Activate(generics.CreateAPIView,):
             code = str(serializer["activate_code"].value)
             if code == c_phone:
 
-                if phone is not exists:
+                if not Profile.objects.filter(userTOprofile=phone).exists():
                     return redirect(reverse('Customer:register',kwargs={"phone":phone}))
-                elif phone is exists:
+                elif Profile.objects.filter(userTOprofile=phone).exists():
+
                     return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
                 else:
                     return Response(serializer.errors,status=status.HTTP_410_GONE)
@@ -100,12 +95,30 @@ class Register(generics.CreateAPIView):
     
 #-------------------------------user profile set-----------------------------
 
-class UserAccontAPI(generics.RetrieveUpdateAPIView):
+class UserAccontAPI(generics.UpdateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Profile.objects.all()
     serializer_class = AccontSerializer
+    
     def get(self, request):
         serializer = AccontSerializer(request.user)
+        return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = request.user
+        print(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        print("oodafez")
+        serializer.is_valid(raise_exception=True)
+        print("salam")
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
         return Response(serializer.data)
     
     def get_serializer_context(self):
@@ -127,10 +140,11 @@ def my_logout(request):
     return HttpResponse("loged out!!!")
 
 
-class RecoverUserAPI(generics.RetrieveAPIView):
+class RecoverUserAPI(generics.CreateAPIView):
     queryset = Profile.objects.all()
+    
+    # queryset=Profile.objects.get(userTOprofile=ph)
     serializer_class = RecoverSerializer
-    lookup_field = 'phone'
     def get_serializer_context(self):
         context = super(RecoverUserAPI, self).get_serializer_context()
         context.update({"phone": str(self.kwargs["phone"])})
