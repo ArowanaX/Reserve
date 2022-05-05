@@ -103,7 +103,7 @@ class UserAccontSerializer(serializers.ModelSerializer):
         fields = ('phone', 'point')
         extra_kwargs = {
             'phone': {'read_only': False},
-            'point': {'read_only': False},
+            'point': {'read_only': True},
             
         }
 
@@ -112,6 +112,7 @@ class AccontSerializer(serializers.ModelSerializer):
         model = Profile
         fields =  ('first_name','last_name','email','userTOprofile')
         extra_kwargs = {
+            'first_name': {'read_only': False},
             'last_name': {'read_only': False},
             'email': {'read_only': True},
             'userTOprofile': {'read_only': False},
@@ -138,4 +139,18 @@ class RecoverSerializer(serializers.ModelSerializer):
             'email': {'required': True},
         }
     def create(self, validated_data):
-        pass
+        phone="0"+str(self.context["phone"])
+        profile = Profile.objects.get(userTOprofile=phone) 
+        request = self.context["request"]
+        user=authenticate(request,id=profile.id,password=phone)
+        print(user)
+        try:
+            login(request,user)
+            print("user loged in....!")
+            return user 
+
+        except:
+            print("cant log...!")
+            return user
+
+        
