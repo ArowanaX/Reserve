@@ -45,7 +45,8 @@ class PhoneVerifi(generics.CreateAPIView):
         if serializer.is_valid():
 
             phone = str(serializer["phone"].value)
-            Send_sms(phone,uid,opt)
+            opt="reg"
+            # Send_sms(phone,uid,opt)
             cache.set(phone,uid,180)
             return redirect(reverse('Customer:activate',kwargs={"phone":str(phone)}))
 
@@ -109,9 +110,7 @@ class UserAccontAPI(generics.UpdateAPIView):
         instance = request.user
         print(instance)
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        print("oodafez")
         serializer.is_valid(raise_exception=True)
-        print("salam")
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
