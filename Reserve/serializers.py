@@ -11,6 +11,10 @@ from Customer.models import Profile
 from Customer.serializers import UserSerializer
 from Supplier.models import Residence
 from .models import Reservation
+from django.urls import reverse
+
+
+
 
 class ReservationSerializer(serializers.ModelSerializer):
     #owner = serializers.HiddenField(
@@ -68,12 +72,16 @@ class ReservationSerializer(serializers.ModelSerializer):
         )
         # Profile.objects.create(profile=reservation, **reserver)
         reservation.save()
+        # id=reservation.id
+        # print("iiiiiiiiiiiiiiiiiiiidddddddddddddddddd")
+        # print(id)
+        # reverse('Reserve:addupcomming',kwargs={"reserve":id})
         return reservation
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
-        fields = ('user','reserve')
+        fields = ('user','residence')
         extra_kwargs = {
         }
     # def create(self, validated_data):
@@ -95,18 +103,38 @@ class WishlistSerializer(serializers.ModelSerializer):
 class AddWishlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
-        fields = ('user','reserve')
+        fields = ('residence',)
         extra_kwargs = {
         }
-    # def update(self, instance, validated_data):
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = get_object_or_404(Profile,email=request.user.email,)
+        wishlist=Wishlist.objects.get_or_create(user=user)[0]
+        residence= Residence.objects.get(pk=validated_data['residence'][0])
+        wishlist.residence.add(residence)
+        wishlist.save()
+        return wishlist
 
-
-    #     return super().update(instance, validated_data)
+class DelWishlistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wishlist
+        fields = ('residence',)
+        extra_kwargs = {
+        }
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = get_object_or_404(Profile,email=request.user.email,)
+        wishlist=Wishlist.objects.get_or_create(user=user)[0]
+        print(type(validated_data['residence'][0]))
+        residence= Residence.objects.get(pk=validated_data['residence'][0])
+        wishlist.residence.remove(residence)
+        wishlist.save()
+        return wishlist
 
 class UpcommingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wishlist
-        fields = ('user','reserve')
+        fields = ('user','residence','reserve')
         extra_kwargs = {
         }
 

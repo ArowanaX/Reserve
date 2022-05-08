@@ -59,22 +59,33 @@ class ShowWishlistAPI(generics.ListAPIView):
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
         return Wishlist.objects.filter(user=user)
 
-class AddWishlistAPI(generics.UpdateAPIView):
+class AddWishlistAPI(generics.CreateAPIView):
     serializer_class = AddWishlistSerializer
 
     def get_queryset(self):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
         return Wishlist.objects.get(user=user)
+    
+    def get_serializer_context(self):
+        context = super(AddWishlistAPI, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
-    def put(self, request, *args, **kwargs):
+
+
+class DelWishlistAPI(generics.CreateAPIView):
+    serializer_class = DelWishlistSerializer
+
+    def get_queryset(self):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
-        reserve= get_object_or_404(Reservation, pk=request.POST.get("id"))
-        wishlist.reserve.add(reserve)
-        wishlist.save()
         return Wishlist.objects.get(user=user)
-
+    
+    def get_serializer_context(self):
+        context = super(DelWishlistAPI, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
 #---------------- upcomming for self reserve & invited link-------------
 #----------------access from auto reserve & url link--------------------
 class AddToUpcomming(generics.UpdateAPIView):
@@ -85,13 +96,13 @@ class AddToUpcomming(generics.UpdateAPIView):
         upcomming=Upcomming.objects.get_or_create(user=user)[0]
         return Upcomming.objects.get(user=user)
 
-    def put(self, request, *args, **kwargs):
-        user = get_object_or_404(Profile,email=self.request.user.email,)
-        upcomming=Upcomming.objects.get_or_create(user=user)[0]
-        reserve= get_object_or_404(Reservation, pk=request.POST.get("id"))
-        upcomming.reserve.add(reserve)
-        upcomming.save()
-        return Upcomming.objects.get(user=user)
+    # def put(self, request, *args, **kwargs):
+    #     user = get_object_or_404(Profile,email=self.request.user.email,)
+    #     upcomming=Upcomming.objects.get_or_create(user=user)[0]
+    #     reserve= get_object_or_404(Reservation, pk=kwargs["reserve"])
+    #     upcomming.reserve.add(reserve)
+    #     upcomming.save()
+    #     return Upcomming.objects.get(user=user)
 
 
 

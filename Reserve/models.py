@@ -39,14 +39,15 @@ class Reservation(models.Model):
     
 
     def __str__(self):
-        return self.id
+        # return self.hotel+ self.reserver
+        return f'{self.hotel} _ {self.reserver}'
     
     class Meta:
         db_table = 'reservation'
 
 class Wishlist(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="wishlisttocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    residence=models.ManyToManyField(Residence,related_name="wishlisttoresidence")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
@@ -54,23 +55,29 @@ class Wishlist(models.Model):
         verbose_name_plural = "Wishlists"
 
     def __str__(self):
-        return str(self.user.last_name)
+        return str(self.user.email)
 
 class Upcomming(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="upcommingtocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    residence=models.ManyToManyField(Residence,related_name="upcommingtoresidence")
+    reserve=models.ManyToManyField(Reservation,related_name="upcommingtoreserve")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
         verbose_name = "Upcomming"
         verbose_name_plural = "Upcommings"
 
+    def __str__(self):
+        return str(self.user.email)
 
 class History(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="historytocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    reserve=models.ManyToManyField(Reservation,related_name="historytoreserve")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
         verbose_name = "History"
         verbose_name_plural = "History"
+
+    def __str__(self):
+        return str(self.user.email)
