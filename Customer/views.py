@@ -52,6 +52,8 @@ class PhoneVerifi(generics.CreateAPIView):
         if serializer.is_valid():
 
             phone = str(serializer["phone"].value)
+            opt="reg"
+            # Send_sms(phone,uid,opt)
             cache.set(phone,uid,180)
             return redirect(reverse('Customer:activate',kwargs={"phone":str(phone)}))
 
@@ -108,6 +110,21 @@ class UserAccontAPI(generics.RetrieveUpdateAPIView):
     def get(self, request):
         serializer = AccontSerializer(request.user)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', True)
+        instance = request.user
+        print(instance)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
     
     def get_serializer_context(self):
         context = super(UserAccontAPI, self).get_serializer_context()
@@ -136,3 +153,6 @@ class RecoverUserAPI(generics.CreateAPIView):
         context.update({"phone": str(self.kwargs["phone"])})
         context.update({"request": self.request})
         return context
+
+
+

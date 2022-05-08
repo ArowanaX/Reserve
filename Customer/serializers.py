@@ -29,6 +29,7 @@ class TypeSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             # 'is_User':{'required': True},
             # 'is_Residence': {'required': True},
+            
         }
 
     
@@ -115,7 +116,7 @@ class AccontSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'last_name': {'read_only': False},
             'email': {'read_only': True},
-            'userTOprofile': {'read_only': False},
+            'userTOprofile': {'read_only': True},
         }
         depth = 1
         
@@ -136,11 +137,21 @@ class RecoverSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
+            # 'email': {'required': True},
         }
     def create(self, validated_data):
         phone="0"+str(self.context["phone"])
-        profile= Profile.objects.get(userTOprofile=phone)
-        request= self.context["request"]
-        user= authenticate(request,email=profile.email,password=phone)
-        login(request,user)
-        return user
+        profile = Profile.objects.get(userTOprofile=phone) 
+        request = self.context["request"]
+        user=authenticate(request,email=profile.email,password=phone)
+        print(user)
+        try:
+            login(request,user)
+            print("user loged in....!")
+            return user 
+
+        except:
+            print("cant log...!")
+            return user
+
+        

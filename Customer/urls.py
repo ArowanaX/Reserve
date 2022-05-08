@@ -1,4 +1,6 @@
 from django.urls import path
+
+from Customer.utils import *
 from .views import *
 
 app_name="Customer"
@@ -12,6 +14,7 @@ urlpatterns = [
     path("activate/<int:phone>", Activate.as_view(), name="activate"),
     path("register/<int:phone>", Register.as_view(), name="register"),
     path("recover/<int:phone>", RecoverUserAPI.as_view(), name="recover"),
+    path("invite/", InviteLink, name="invite"),
 
 
 #-----------------------------show user dashboard---------------------------------

@@ -15,14 +15,14 @@ class Profile(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     objects = CustomUserManager()
-    
+
     email = models.EmailField('email address', primary_key=True)
-    # last_login = models.UUIDField(default=uuid.uuid4,editable=True)
-    id = models.CharField(max_length=30, unique=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(max_length=30,unique=True, default=uuid.uuid4, editable=False)
     username = None
     is_User = models.BooleanField( default=False)
     is_Residence = models.BooleanField( default=False)
     
+
 
     def __str__(self):
         if self.is_Residence:

@@ -1,8 +1,18 @@
 from django.urls import path
-from .views import ReservationAPIView
 
-app_name = 'Reserve'
+# from Customer.utils import Send_sms
+from .views import *
+
+app_name="Reservation"
 
 urlpatterns = [
-    path("reservation/<str:name>", ReservationAPIView.as_view(), name="reservation"),
+
+
+#------------------------------serial call for register user---------------------
+
+    path("wishlist/",ShowWishlistAPI.as_view(),name="wishlist"),
+    path("addwishlist/",AddWishlistAPI.as_view(),name="addwishlist"),
+    path("upcomming/",ShowUpcommingAPI.as_view(),name="upcomming"),
+
+
 ]
