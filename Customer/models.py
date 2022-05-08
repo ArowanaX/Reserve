@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 # from Reservation.models import Reserve
 # from Supplier.models import *
-
+from .managers import *
 import uuid
 
 
@@ -11,11 +11,16 @@ import uuid
 #-------------------------------------base user--------------------------------------
 class Profile(AbstractUser):
 
-    USERNAME_FIELD = 'id'
-    id = models.CharField(max_length=30,primary_key=True, default=uuid.uuid4, editable=False)
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    objects = CustomUserManager()
+
+    email = models.EmailField('email address', primary_key=True)
+    id = models.CharField(max_length=30,unique=True, default=uuid.uuid4, editable=False)
     username = None
     is_User = models.BooleanField( default=False)
     is_Residence = models.BooleanField( default=False)
+
 
     def __str__(self):
         return str(self.last_name)

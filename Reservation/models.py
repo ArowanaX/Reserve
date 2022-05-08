@@ -24,6 +24,8 @@ class Wishlist(models.Model):
         verbose_name = "Wishlist"
         verbose_name_plural = "Wishlists"
 
+    def __str__(self):
+        return str(self.user.last_name)
 
 class Upcomming(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="upcommingtocustomer")
