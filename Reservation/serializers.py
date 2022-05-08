@@ -39,3 +39,20 @@ class AddWishlistSerializer(serializers.ModelSerializer):
 
 
     #     return super().update(instance, validated_data)
+
+class UpcommingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Wishlist
+        fields = ('user','reserve')
+        extra_kwargs = {
+        }
+
+
+
+
+class AddUpcommingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Upcomming
+        fields = ('user','reserve')
+        extra_kwargs = {
+        }

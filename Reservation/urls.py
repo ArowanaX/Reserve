@@ -12,5 +12,7 @@ urlpatterns = [
 
     path("wishlist/",ShowWishlistAPI.as_view(),name="wishlist"),
     path("addwishlist/",AddWishlistAPI.as_view(),name="addwishlist"),
+    path("upcomming/",ShowUpcommingAPI.as_view(),name="upcomming"),
+
 
 ]
