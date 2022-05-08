@@ -43,3 +43,34 @@ class Reservation(models.Model):
     
     class Meta:
         db_table = 'reservation'
+
+class Wishlist(models.Model):
+    user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="wishlisttocustomer")
+    reserve=models.ManyToManyField(Reservation)
+    # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
+
+    class Meta:
+        verbose_name = "Wishlist"
+        verbose_name_plural = "Wishlists"
+
+    def __str__(self):
+        return str(self.user.last_name)
+
+class Upcomming(models.Model):
+    user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="upcommingtocustomer")
+    reserve=models.ManyToManyField(Reservation)
+    # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
+
+    class Meta:
+        verbose_name = "Upcomming"
+        verbose_name_plural = "Upcommings"
+
+
+class History(models.Model):
+    user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="historytocustomer")
+    reserve=models.ManyToManyField(Reservation)
+    # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
+
+    class Meta:
+        verbose_name = "History"
+        verbose_name_plural = "History"

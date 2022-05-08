@@ -77,18 +77,16 @@ class Activate(generics.CreateAPIView,):
             c_phone=cache.get(phone)
             code = str(serializer["activate_code"].value)
             if code == c_phone:
-                return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
+                if not Profile.objects.filter(userTOprofile=phone).exists():
+                    return redirect(reverse('Customer:register',kwargs={"phone":phone}))
+                elif Profile.objects.filter(userTOprofile=phone).exists():
 
-            #     if phone is not exists:
-            #         return redirect(reverse('Customer:register',kwargs={"phone":phone}))
-            #     elif phone is exists:
-            #         return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
-            #     else:
-            #         return Response(serializer.errors,status=status.HTTP_410_GONE)
+                    return redirect(reverse('Customer:recover',kwargs={"phone":phone}))
+                else:
+                    return Response(serializer.errors,status=status.HTTP_410_GONE)
     
-            # else:
-            #     return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
-
+            else:
+                return Response(serializer.errors,status=status.HTTP_403_FORBIDDEN)
 
 #-----------------------------------register user----------------------------
 
