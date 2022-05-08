@@ -105,7 +105,7 @@ class UserAccontSerializer(serializers.ModelSerializer):
         fields = ('phone', 'point')
         extra_kwargs = {
             'phone': {'read_only': False},
-            'point': {'read_only': True},
+            'point': {'read_only': False},
             
         }
 
@@ -114,7 +114,6 @@ class AccontSerializer(serializers.ModelSerializer):
         model = Profile
         fields =  ('first_name','last_name','email','userTOprofile')
         extra_kwargs = {
-            'first_name': {'read_only': False},
             'last_name': {'read_only': False},
             'email': {'read_only': True},
             'userTOprofile': {'read_only': True},

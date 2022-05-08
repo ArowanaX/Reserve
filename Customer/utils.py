@@ -8,7 +8,7 @@ import requests
 import json
 #------------------------------------send sms activation code--------------------------------
 
-def Send_sms(phone,uid,opt):
+def Send_sms(to_phone,uid):
 
     try:
         username =os.environ.get("SMS_HOST_USERNAME","")

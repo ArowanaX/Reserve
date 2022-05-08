@@ -34,10 +34,11 @@ INSTALLED_APPS = [
        #---------- project app------------
     'Customer',
     'Supplier',
-    'Reservation',
+    'Reserve',
 
     # 'django_celery_results',
     'rest_framework',
+    'rest_framework.authtoken',
     'django_filters',
     'django_social_share',
 ]
@@ -150,8 +151,8 @@ REST_FRAMEWORK = {
     'FORM_CONTENTTYPE_OVERRIDE': None,
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication'
-        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+         'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],

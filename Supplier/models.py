@@ -1,6 +1,7 @@
 import email
 from django.db import models
 from django.utils.translation import gettext as _
+from django.contrib.auth.password_validation import validate_password
 
 
 from Customer.models import Profile
@@ -19,8 +20,8 @@ class Residence(models.Model):
     # is_anonymous = False
     is_active = True
     #location = models.
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, primary_key=True,related_name="residenceTOprofile")
-    name = models.CharField(unique=True,max_length=20,verbose_name="res_name")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,unique=True,null=True,blank=True, related_name="residenceTOprofile")
+    name = models.CharField(primary_key=True,max_length=20,verbose_name="res_name")
     # last_login = models.CharField(max_length=300,null=True,blank=True)
     address = models.TextField(verbose_name=_("address"))
     city = models.CharField(max_length=20,null=False,blank=False)
