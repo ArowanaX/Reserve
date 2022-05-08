@@ -1,3 +1,4 @@
+import email
 import profile
 from wsgiref.validate import validator
 from django.utils.translation import gettext as _
@@ -81,9 +82,9 @@ class UserSerializer(serializers.ModelSerializer):
                 phone="0"+str(self.context["phone"]),
                 profile= user
             )
-        profile=Profile.objects.latest('date_joined').id
+        profile=Profile.objects.latest('date_joined').email
         request = self.context["request"]
-        user=authenticate(request,id=profile,password=phone)
+        user=authenticate(request,email=profile,password=phone)
         
     
         try:
@@ -103,7 +104,7 @@ class UserAccontSerializer(serializers.ModelSerializer):
         fields = ('phone', 'point')
         extra_kwargs = {
             'phone': {'read_only': False},
-            'point': {'read_only': True},
+            'point': {'read_only': False},
             
         }
 
@@ -112,7 +113,6 @@ class AccontSerializer(serializers.ModelSerializer):
         model = Profile
         fields =  ('first_name','last_name','email','userTOprofile')
         extra_kwargs = {
-            'first_name': {'read_only': False},
             'last_name': {'read_only': False},
             'email': {'read_only': True},
             'userTOprofile': {'read_only': False},
@@ -132,25 +132,15 @@ class AccontSerializer(serializers.ModelSerializer):
 class RecoverSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
-        fields = ('first_name', 'last_name','email')
+        fields = ('first_name', 'last_name')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
-            'email': {'required': True},
         }
     def create(self, validated_data):
         phone="0"+str(self.context["phone"])
-        profile = Profile.objects.get(userTOprofile=phone) 
-        request = self.context["request"]
-        user=authenticate(request,id=profile.id,password=phone)
-        print(user)
-        try:
-            login(request,user)
-            print("user loged in....!")
-            return user 
-
-        except:
-            print("cant log...!")
-            return user
-
-        
+        profile= Profile.objects.get(userTOprofile=phone)
+        request= self.context["request"]
+        user= authenticate(request,email=profile.email,password=phone)
+        login(request,user)
+        return user

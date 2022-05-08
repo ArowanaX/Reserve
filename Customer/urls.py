@@ -1,6 +1,4 @@
 from django.urls import path
-
-from Customer.utils import Send_sms
 from .views import *
 
 app_name="Customer"
@@ -14,7 +12,6 @@ urlpatterns = [
     path("activate/<int:phone>", Activate.as_view(), name="activate"),
     path("register/<int:phone>", Register.as_view(), name="register"),
     path("recover/<int:phone>", RecoverUserAPI.as_view(), name="recover"),
-    path("sms/", Send_sms, name="sms"),
 
 
 #-----------------------------show user dashboard---------------------------------

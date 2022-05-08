@@ -1,26 +1,37 @@
-from melipayamak import Api
-from rest_framework.response import Response
-from rest_framework import status
-import os
+from kavenegar import *
+
+
 
 #------------------------------------send sms activation code--------------------------------
 
-def Send_sms(phone,uid,opt):
+def Send_sms(to_phone,uid):
 
     try:
-        username =os.environ.get("SMS_HOST_USERNAME","")
-        password =os.environ.get("SMS_HOST_PASSWORD","")
-        print(username)
-        print(password)
-        api = Api(username,password)
-        sms = api.sms()
-        to = phone
-        _from = os.environ.get("SMS_HOST_SENDER","")
-        text = 'کد تاییدیه شما از طرف هوگامان'+' '+ uid
-        response = sms.send(to,_from,text)
-        print(response)
-        return Response(status=status.HTTP_200_OK)
-    except:
-        print("sms dont send.................................")
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        api = KavenegarAPI('774E597277394F4F73686F64396B577344752B6751464861725559774464713543567463305451702B59733D')
+        params = { 'sender' : '100047778', 'receptor': '09120857673', 'message' :'.وب سرویس پیام کوتاه کاوه نگار' }
+        response = api.sms_send( params)
         
+    except:
+        print("sms is sending.................................")
+        return
+
+
+
+
+
+
+
+
+
+    # try:
+    #     api = KavenegarAPI('Your APIKey', timeout=20)
+    #     params = {
+    #         'receptor': to_phone,
+    #         'message': uid,
+    #     } 
+    #     response = api.sms_send(params)
+    #     print(response)
+    # except APIException as e: 
+    #     print(e)
+    # except HTTPException as e: 
+    #     print(e)
