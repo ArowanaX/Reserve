@@ -59,7 +59,7 @@ class Wishlist(models.Model):
 
 class Upcomming(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="upcommingtocustomer")
-    residence=models.ManyToManyField(Residence,related_name="upcommingtoresidence")
+    # residence=models.ManyToManyField(Residence,related_name="upcommingtoresidence")
     reserve=models.ManyToManyField(Reservation,related_name="upcommingtoreserve")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 

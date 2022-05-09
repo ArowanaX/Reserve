@@ -161,7 +161,7 @@ class RecoverSerializer(serializers.ModelSerializer):
 class ChoiseSerializer(serializers.Serializer):
     whatsapp = serializers.BooleanField(default=False)
     with_phone = serializers.BooleanField(default=False)
-    phone=serializers.CharField(label=_("PHONE"),trim_whitespace=True)
+    phone=serializers.CharField(label=_("PHONE"),trim_whitespace=True,required=False)
     def create(self, validated_data):
         res_id = self.context['res_id']
         link = f"/Customer/phone/{res_id}"

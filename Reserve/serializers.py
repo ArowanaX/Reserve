@@ -1,10 +1,13 @@
+from django.http import HttpResponseForbidden
 from rest_framework import serializers
-
+from rest_framework.response import Response
+from rest_framework import status
+from django.http import HttpResponse
 from Reserve.models import Wishlist
 from django.shortcuts import get_object_or_404
 from .models import *
 from pkg_resources import require
-from requests import request
+from requests import delete, request
 from rest_framework import serializers
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from Customer.models import Profile
@@ -133,8 +136,8 @@ class DelWishlistSerializer(serializers.ModelSerializer):
 
 class UpcommingSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Wishlist
-        fields = ('user','residence','reserve')
+        model = Upcomming
+        fields = ('user','reserve')
         extra_kwargs = {
         }
 
@@ -144,6 +147,46 @@ class UpcommingSerializer(serializers.ModelSerializer):
 class AddUpcommingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Upcomming
-        fields = ('user','reserve')
+        fields = ('reserve',)
         extra_kwargs = {
         }
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = get_object_or_404(Profile,email=request.user.email,)
+        upcomming=Upcomming.objects.get_or_create(user=user)[0]
+        res=validated_data['reserve'][0]
+        reserve= Reservation.objects.get(id=res.id)
+        if reserve.reserver==user:
+            upcomming.reserve.add(reserve)
+            upcomming.save()
+            return upcomming
+        else:
+            return upcomming
+
+class DelUpcommingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Upcomming
+        fields = ('reserve',)
+        extra_kwargs = {
+        }
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = get_object_or_404(Profile,email=request.user.email,)
+        upcomming=Upcomming.objects.get_or_create(user=user)[0]
+        res=validated_data['reserve'][0]
+        reserve= Reservation.objects.get(id=res.id)
+        upcomming.reserve.remove(reserve)
+        upcomming.save()
+        return upcomming
+
+    # def update(self, instance, validated_data):
+    #     request = self.context["request"]
+    #     user = get_object_or_404(Profile,email=request.user.email,)
+    #     upcomming=Upcomming.objects.get(user=user)[0]
+    #     res=validated_data['reserve'][0]
+    #     reserve= Reservation.objects.get(id=res.id)
+    #     upcomming.reserve.remove(reserve)
+    #     upcomming.save()
+    #     print("gooooooooooooooooooooooooooooooooooohl")
+    #     return upcomming
+      

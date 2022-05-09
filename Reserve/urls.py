@@ -15,6 +15,8 @@ urlpatterns = [
     path("delwishlist/",DelWishlistAPI.as_view(),name="delwishlist"),
     path("upcomming/",ShowUpcommingAPI.as_view(),name="upcomming"),
     path("addupcomming/",AddToUpcomming.as_view(),name="addupcomming"),
+    path("delupcomming/",DelUpcommingAPI.as_view(),name="delupcomming"),
+
 
 
 ]

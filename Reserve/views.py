@@ -11,6 +11,7 @@ from Reserve.serializers import *
 from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 
 # Create your views here.
@@ -23,31 +24,18 @@ class ReservationAPIView(generics.ListCreateAPIView):
         name = self.kwargs.get(self.lookup_url_kwarg)
         hotel = Residence.objects.filter(name=name)
         return hotel
-    # def get(self,request,*args,**kwargs):
-    #     data = request.GET.get('name')
-    #     return Response(data, status=status.HTTP_200_OK)
 
-
-    # def post(self, request, name):
-    #     # def perform_create(self, serializer):
-    #     #     serializer.save(reserver=self.request.user)
-
-    #     ser_data = ReservationSerializer(data=request.data)
-    #     if ser_data.is_valid():
-    #         ser_data.save()
-    #         return Response(ser_data.data,status=status.HTTP_201_CREATED)
-    #     return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
     
     def get_serializer_context(self):
          context = super(ReservationAPIView,self).get_serializer_context()
          context.update({"request":self.request})
          print(self.kwargs['name'])
-         #print(self.request['name'])
          context.update({"name":self.kwargs['name']})
          return context
          
 class ShowWishlistAPI(generics.ListAPIView):
     serializer_class = WishlistSerializer
+    permission_classes = (IsAuthenticated,)
     
     def get_serializer_context(self):
         context = super(ShowWishlistAPI, self).get_serializer_context()
@@ -59,13 +47,14 @@ class ShowWishlistAPI(generics.ListAPIView):
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
         return Wishlist.objects.filter(user=user)
 
-class AddWishlistAPI(generics.CreateAPIView):
+class AddWishlistAPI(generics.ListCreateAPIView):
     serializer_class = AddWishlistSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
-        return Wishlist.objects.get(user=user)
+        return Wishlist.objects.filter(user=user)
     
     def get_serializer_context(self):
         context = super(AddWishlistAPI, self).get_serializer_context()
@@ -74,13 +63,14 @@ class AddWishlistAPI(generics.CreateAPIView):
 
 
 
-class DelWishlistAPI(generics.CreateAPIView):
+class DelWishlistAPI(generics.ListCreateAPIView):
     serializer_class = DelWishlistSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         wishlist=Wishlist.objects.get_or_create(user=user)[0]
-        return Wishlist.objects.get(user=user)
+        return Wishlist.objects.filter(user=user)
     
     def get_serializer_context(self):
         context = super(DelWishlistAPI, self).get_serializer_context()
@@ -88,26 +78,23 @@ class DelWishlistAPI(generics.CreateAPIView):
         return context
 #---------------- upcomming for self reserve & invited link-------------
 #----------------access from auto reserve & url link--------------------
-class AddToUpcomming(generics.UpdateAPIView):
+class AddToUpcomming(generics.ListCreateAPIView):
     serializer_class = AddUpcommingSerializer
+    permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         upcomming=Upcomming.objects.get_or_create(user=user)[0]
-        return Upcomming.objects.get(user=user)
+        return Upcomming.objects.filter(user=user)
 
-    # def put(self, request, *args, **kwargs):
-    #     user = get_object_or_404(Profile,email=self.request.user.email,)
-    #     upcomming=Upcomming.objects.get_or_create(user=user)[0]
-    #     reserve= get_object_or_404(Reservation, pk=kwargs["reserve"])
-    #     upcomming.reserve.add(reserve)
-    #     upcomming.save()
-    #     return Upcomming.objects.get(user=user)
-
-
+    def get_serializer_context(self):
+        context = super(AddToUpcomming, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
 class ShowUpcommingAPI(generics.ListAPIView):
     serializer_class = UpcommingSerializer
+    permission_classes = (IsAuthenticated,)
     
     def get_serializer_context(self):
         context = super(ShowUpcommingAPI, self).get_serializer_context()
@@ -118,3 +105,17 @@ class ShowUpcommingAPI(generics.ListAPIView):
         user = get_object_or_404(Profile,email=self.request.user.email,)
         upcomming=Upcomming.objects.get_or_create(user=user)[0]
         return Upcomming.objects.filter(user=user)
+
+class DelUpcommingAPI(generics.ListCreateAPIView):
+    serializer_class = DelUpcommingSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = get_object_or_404(Profile,email=self.request.user.email,)
+        upcomming=Upcomming.objects.get_or_create(user=user)[0]
+        return Upcomming.objects.filter(user=user)
+
+    def get_serializer_context(self):
+        context = super(DelUpcommingAPI, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
