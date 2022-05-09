@@ -2,13 +2,18 @@ from melipayamak import Api
 from rest_framework.response import Response
 from rest_framework import status
 import os
-# from twilio.rest import Client
-from django.urls import reverse
+
 import requests
 import json
+from rest_framework import generics,status
+
+from Customer.models import Profile
+
+
+
 #------------------------------------send sms activation code--------------------------------
 
-def Send_sms(to_phone,uid):
+def Send_sms(phone,uid,opt):
 
     try:
         username =os.environ.get("SMS_HOST_USERNAME","")
@@ -21,6 +26,7 @@ def Send_sms(to_phone,uid):
             text = 'کد تاییدیه شما از طرف هوگامان'+' '+ uid
         if opt=="inv":
             text = 'شما به هتل ما دعوت شدید'+ uid
+        print(text)
         # response = sms.send(to,_from,text)
         # print(response)
         return Response(status=status.HTTP_200_OK)
@@ -66,28 +72,3 @@ def Notification(request):
 
 
 #---------------------- create invite link----------------------------
-
-def InviteLink(request,res_id,ph_list):
-    link=reverse("customer:phone",kwargs={"valid":res_id})
-    link_domin= "127.0.0.1:8000"+link
-    phone=request.user.phone
-    Notification(request)
-    for elm in ph_list:
-        Send_sms(elm,link_domin,"inv")
-    
-
-
-# class Whatsapp():
-#     account_sid = os.environ['TWILIO_ACCOUNT_SID']
-#     auth_token = os.environ['TWILIO_AUTH_TOKEN']
-#     client = Client(account_sid, auth_token)
-
-#     message = client.messages \
-#                     .create(
-#                         body="Join Earth's mightiest heroes. Like Kevin Bacon.",
-#                         from_='+15017122661',
-#                         to='+15558675310'
-#                     )
-
-    # print(message.sid)
-    

@@ -11,10 +11,12 @@ urlpatterns = [
 #------------------------------serial call for register user---------------------
 
     path("phone/",PhoneVerifi.as_view(),name="phone"),
+    path("phone/<str:res_id>",PhoneVerifi.as_view(),name="phone"),
     path("activate/<int:phone>", Activate.as_view(), name="activate"),
     path("register/<int:phone>", Register.as_view(), name="register"),
     path("recover/<int:phone>", RecoverUserAPI.as_view(), name="recover"),
-    path("invite/", InviteLink, name="invite"),
+    path("invite/<str:res_id>", InviteLink.as_view(), name="invite"),
+   
 
 
 #-----------------------------show user dashboard---------------------------------
