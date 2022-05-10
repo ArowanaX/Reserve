@@ -15,6 +15,8 @@ from Customer.serializers import UserSerializer
 from Supplier.models import Residence
 from .models import Reservation
 from django.urls import reverse
+from Customer.utils import Send_sms
+from .utils import send_mail
 
 
 
@@ -66,6 +68,8 @@ class ReservationSerializer(serializers.ModelSerializer):
         history_sup=History.objects.get_or_create(user=to_hotel)[0]
         history_sup.reserve.add(reservation)
         history_sup.save()
+        # send_mail()
+        Send_sms(to_hotel.phone,reservation,"notif")
 
         return reservation
 
