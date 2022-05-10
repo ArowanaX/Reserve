@@ -11,32 +11,13 @@ from Reserve.serializers import *
 from .models import *
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
+from .utils import send_email, send_mail
 
 
 # Create your views here.
 class ReservationAPIView(generics.ListCreateAPIView):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
-    lookup_field = "name"
-    
-    def get_queryset(self):
-        name = self.kwargs.get(self.lookup_url_kwarg)
-        hotel = Residence.objects.filter(name=name)
-        return hotel
-    # def get(self,request,*args,**kwargs):
-    #     data = request.GET.get('name')
-    #     return Response(data, status=status.HTTP_200_OK)
-
-
-    # def post(self, request, name):
-    #     # def perform_create(self, serializer):
-    #     #     serializer.save(reserver=self.request.user)
-
-    #     ser_data = ReservationSerializer(data=request.data)
-    #     if ser_data.is_valid():
-    #         ser_data.save()
-    #         return Response(ser_data.data,status=status.HTTP_201_CREATED)
-    #     return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
     
     def get_serializer_context(self):
          context = super(ReservationAPIView,self).get_serializer_context()
@@ -45,6 +26,27 @@ class ReservationAPIView(generics.ListCreateAPIView):
          #print(self.request['name'])
          context.update({"name":self.kwargs['name']})
          return context
+        
+        
+    def post(self, request, name):
+        ser_data = ReservationSerializer(data=request.data)
+        user=self.request.user
+        email = user.email
+        print(email)
+        if ser_data.is_valid():
+            offers = ser_data['offers'].value
+            news = ser_data['news'].value
+            #sms = ser_data['sms'].value
+            print(offers)
+            if offers==True or news==True :
+                print('OK')
+                try:
+                    send_mail(html=None,text='Email_body',subject='Hello word',from_email='maryamnadeali@yahoo.com',to_emails=[str(email)])
+                except:
+                    return Response('email not send....!')
+            #ser_data.save()
+            return Response(ser_data.data,status=status.HTTP_201_CREATED)
+        return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
          
 class ShowWishlistAPI(generics.ListAPIView):
     serializer_class = WishlistSerializer

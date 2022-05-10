@@ -36,8 +36,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         
         
     def create(self, validated_data):
-        # reserver = validated_data['reserver']
-        #my_reserve= self.context["request"]
         
         request = self.context["request"]
         print(request)
@@ -47,9 +45,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         to_hotel=Profile.objects.get(residenceTOprofile=hotel)
         print(hotel)
         print(reserver)
-        #hotel = Residence.objects.get(name=request.POST.get("name",""))
-        #hotel = self.hotel
-        #print(hotel)
         print('qqqqqqqqqqqqqqqqqqqq')
         reservation = Reservation.objects.create(
             reserver=reserver,

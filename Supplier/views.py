@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import ResidenceSerializer,LoginSerializer,ProfilSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
+from .serializers import ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
 from .models import Profile,Residence,ResidenceOutdoorAlbum
 import json
 
@@ -42,32 +42,45 @@ class ResidenceRegisterAPI(generics.CreateAPIView):
 class LoginAPIView(generics.CreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = LoginSerializer
+
     #authentication_classes = (SessionAuthentication, BasicAuthentication)
     def post(self, request):
         
         ser_data = LoginSerializer(instance = request.data)
         email = request.data['email']
+            #ser_data.save()
+        #return redirect(reverse('Supplier:account',args=[email]))
+        
+        #return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
         password = request.data['password']
         user = authenticate(request, email=email, password=password)
-        if user is not None: 
+            
+        if user is not None:
             try:
-                login(request, user, backend='apps.backend.EmailBackend')
+                login(request, user)
                 print("loged in.....!")
-                #return redirect(reverse('profile/<str:email>'))
-                return Response(ser_data.data,status=status.HTTP_202_ACCEPTED)
+                #return Response(ser_data.data,status=status.HTTP_202_ACCEPTED)
+                return redirect(reverse('Supplier:account',args=[email]))
             except:
                 print("cant login...!")
                 return Response(ser_data.errors,status=status.HTTP_403_FORBIDDEN)
 
+        # return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
 
 #-----------------------------residence show & edit accont----------------------
 
-class ProfileView(generics.RetrieveUpdateAPIView):
-
+class AccountAPIView(generics.RetrieveUpdateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = Profile.objects.all()
-    serializer_class = ProfilSerializer
+    serializer_class = AccountSerializer
     lookup_field = 'email'
-
+    def get(self, request, email):
+        serializer = AccountSerializer(request.user)
+        return Response(serializer.data)
+   
 class AddOUTImageAlbum(generics.ListCreateAPIView):
 
     queryset = ResidenceOutdoorAlbum.objects.all()

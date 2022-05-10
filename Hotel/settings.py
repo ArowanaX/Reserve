@@ -179,10 +179,20 @@ CACHES = {
 
 
 
-
+# CELERY Config
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_TIMEZONE = "Asia/Tehran"
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_RESULT_SERIALIZER = 'json'
+
+
+# SMTP Mail service with decouple
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = 'maryamnadeali6989@yahoo.com'
+EMAIL_HOST_PASSWORD = '09137217213'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

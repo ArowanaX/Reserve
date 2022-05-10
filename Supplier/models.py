@@ -20,7 +20,7 @@ class Residence(models.Model):
     # is_anonymous = False
     is_active = True
     #location = models.
-    profile = models.OneToOneField(Profile, on_delete=models.CASCADE,unique=True,null=True,blank=True, related_name="residenceTOprofile")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=True, null=True, blank=True, related_name="residenceTOprofile")
     name = models.CharField(primary_key=True,max_length=20,verbose_name="res_name")
     # last_login = models.CharField(max_length=300,null=True,blank=True)
     address = models.TextField(verbose_name=_("address"))
