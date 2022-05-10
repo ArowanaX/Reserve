@@ -1,6 +1,6 @@
-import email
-import profile
+
 from wsgiref.validate import validator
+from django.http import HttpResponse
 from django.utils.translation import gettext as _
 # from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -9,9 +9,11 @@ from requests import request
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from rest_framework.validators import UniqueValidator
 from rest_framework import serializers
-
-
+from django.urls import reverse
+from django.shortcuts import redirect
+from .utils import Send_sms
 from .models import User,Profile
+# from .views import InviteLinkPhone
 
 
 # from Customer.utils import Send_sms
@@ -154,4 +156,23 @@ class RecoverSerializer(serializers.ModelSerializer):
             print("cant log...!")
             return user
 
+
+
+class ChoiseSerializer(serializers.Serializer):
+    whatsapp = serializers.BooleanField(default=False)
+    with_phone = serializers.BooleanField(default=False)
+    phone=serializers.CharField(label=_("PHONE"),trim_whitespace=True,required=False)
+    def create(self, validated_data):
+        res_id = self.context['res_id']
+        link = f"/Customer/phone/{res_id}"
+        link_domin= "127.0.0.1:8000"+link
+        if validated_data['whatsapp']:
+            print(validated_data['whatsapp'])
+            whatsapp_link_domin = f"https://api.whatsapp.com/send?text={link_domin}"
+            print(whatsapp_link_domin)
+        if validated_data['with_phone']:
+            my_phone=validated_data['phone']
+            phone_link_domin = link_domin
+            Send_sms(my_phone,phone_link_domin,"inv")
+        return User.objects.last()
         
