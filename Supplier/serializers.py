@@ -3,6 +3,7 @@ import email
 #from typing_extensions import Required
 #from typing_extensions import Self
 from django.contrib.auth.password_validation import validate_password
+from django.forms import CharField
 from pkg_resources import require
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from django.contrib.auth import login,authenticate
@@ -165,8 +166,6 @@ class AccountSerializer(serializers.ModelSerializer):
         # Runs the original parent update(), since the nested fields were
         # "popped" out of the data
         return super(AccountSerializer, self).update(instance, validated_data)
-            
-        
 
 class Add_outdoorimage_serializer(serializers.ModelSerializer):
     class Meta:

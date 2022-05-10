@@ -1,4 +1,5 @@
 from django.contrib.auth import login,authenticate
+from django.core.cache import cache
 from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -10,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
+from .serializers import ResidenceSerializer,LoginSerializer,AccountSerializer,VerificationCodeSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
 from .models import Profile,Residence,ResidenceOutdoorAlbum
 import json
 
@@ -66,9 +67,6 @@ class LoginAPIView(generics.CreateAPIView):
                 return Response(ser_data.errors,status=status.HTTP_403_FORBIDDEN)
 
         # return Response(ser_data.errors,status=status.HTTP_400_BAD_REQUEST)
-        
-        
-
 
 #-----------------------------residence show & edit accont----------------------
 
@@ -79,7 +77,7 @@ class AccountAPIView(generics.RetrieveUpdateAPIView):
     lookup_field = 'email'
     def get(self, request, email):
         serializer = AccountSerializer(request.user)
-        return Response(serializer.data)
+        return Response(serializer.data)        
    
 class AddOUTImageAlbum(generics.ListCreateAPIView):
 
