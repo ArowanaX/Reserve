@@ -63,6 +63,9 @@ class ReservationSerializer(serializers.ModelSerializer):
         history=History.objects.get_or_create(user=reserver)[0]
         history.reserve.add(reservation)
         history.save()
+        history=History.objects.get_or_create(user=to_hotel)[0]
+        history.reserve.add(reservation)
+        history.save()
 
         return reservation
 
