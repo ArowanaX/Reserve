@@ -53,6 +53,7 @@ class Wishlist(models.Model):
     class Meta:
         verbose_name = "Wishlist"
         verbose_name_plural = "Wishlists"
+        db_table = 'Wishlist'
 
     def __str__(self):
         return str(self.user.email)
@@ -66,6 +67,7 @@ class Upcomming(models.Model):
     class Meta:
         verbose_name = "Upcomming"
         verbose_name_plural = "Upcommings"
+        db_table = 'upcomming'
 
     def __str__(self):
         return str(self.user.email)
@@ -78,6 +80,7 @@ class History(models.Model):
     class Meta:
         verbose_name = "History"
         verbose_name_plural = "History"
+        db_table = 'History'
 
     def __str__(self):
         return str(self.user.email)

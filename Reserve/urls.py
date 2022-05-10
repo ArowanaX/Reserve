@@ -16,6 +16,8 @@ urlpatterns = [
     path("upcomming/",ShowUpcommingAPI.as_view(),name="upcomming"),
     path("addupcomming/",AddToUpcomming.as_view(),name="addupcomming"),
     path("delupcomming/",DelUpcommingAPI.as_view(),name="delupcomming"),
+    path("history/",HistoryAPI.as_view(),name="history"),
+
 
 
 

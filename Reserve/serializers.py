@@ -20,9 +20,6 @@ from django.urls import reverse
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    #owner = serializers.HiddenField(
-    #default=serializers.CurrentUserDefault()
-#)
     class Meta:
         model = Reservation
         fields = ('date_in','date_out','person_num','type_room','request_user','offers','news','sms')
@@ -43,25 +40,14 @@ class ReservationSerializer(serializers.ModelSerializer):
         
         
     def create(self, validated_data):
-        # reserver = validated_data['reserver']
-        #my_reserve= self.context["request"]
         
         request = self.context["request"]
-        print(request)
         reserver = request.user
         my_hotel = self.context["name"]
         hotel = Residence.objects.get(name=my_hotel)
         to_hotel=Profile.objects.get(residenceTOprofile=hotel)
-        print(hotel)
-        print(reserver)
-        #hotel = Residence.objects.get(name=request.POST.get("name",""))
-        #hotel = self.hotel
-        #print(hotel)
-        print('qqqqqqqqqqqqqqqqqqqq')
         reservation = Reservation.objects.create(
             reserver=reserver,
-            #hotel = validated_data['hotel'],
-            # order_date=validated_data['order_date'],
             hotel =to_hotel,
             date_in=validated_data['date_in'],
             date_out=validated_data['date_out'],
@@ -73,12 +59,11 @@ class ReservationSerializer(serializers.ModelSerializer):
             sms=validated_data['sms']
             
         )
-        # Profile.objects.create(profile=reservation, **reserver)
         reservation.save()
-        # id=reservation.id
-        # print("iiiiiiiiiiiiiiiiiiiidddddddddddddddddd")
-        # print(id)
-        # reverse('Reserve:addupcomming',kwargs={"reserve":id})
+        history=History.objects.get_or_create(user=reserver)[0]
+        history.reserve.add(reservation)
+        history.save()
+
         return reservation
 
 class WishlistSerializer(serializers.ModelSerializer):
@@ -87,21 +72,6 @@ class WishlistSerializer(serializers.ModelSerializer):
         fields = ('user','residence')
         extra_kwargs = {
         }
-    # def create(self, validated_data):
-    #     # phone="0"+str(self.context["phone"])
-    #     # user = get_object_or_404(Profile, email=request.user.email) 
-    #     request = self.context["request"]
-    #     print("reqqqqqqqqqqq")
-    #     print(request)
-    #     user = get_object_or_404(Profile,id=request.id,) 
-    #     print("userrrrrrrrrrr")
-    #     print(user)
-    #     # wishlist = self.context["request"]
-    #     wishlist=Wishlist.objects.get_or_create(user=user)
-
-    #     # user=authenticate(request,id=profile.id,password=phone)
-    #     print(wishlist[0])
-    #     return wishlist
     
 class AddWishlistSerializer(serializers.ModelSerializer):
     class Meta:
@@ -179,14 +149,20 @@ class DelUpcommingSerializer(serializers.ModelSerializer):
         upcomming.save()
         return upcomming
 
-    # def update(self, instance, validated_data):
+class HistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = History
+        fields = ('user','reserve')
+        extra_kwargs = {
+            'reserver': {'read_only': True},
+            'user': {'read_only': True},
+        }
+    # def create(self, validated_data):
     #     request = self.context["request"]
     #     user = get_object_or_404(Profile,email=request.user.email,)
-    #     upcomming=Upcomming.objects.get(user=user)[0]
+    #     history=History.objects.get_or_create(user=user)[0]
     #     res=validated_data['reserve'][0]
     #     reserve= Reservation.objects.get(id=res.id)
-    #     upcomming.reserve.remove(reserve)
-    #     upcomming.save()
-    #     print("gooooooooooooooooooooooooooooooooooohl")
-    #     return upcomming
-      
+    #     history.reserve.add(reserve)
+    #     history.save()
+    #     return history

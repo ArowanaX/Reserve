@@ -119,3 +119,17 @@ class DelUpcommingAPI(generics.ListCreateAPIView):
         context = super(DelUpcommingAPI, self).get_serializer_context()
         context.update({"request": self.request})
         return context
+
+class HistoryAPI(generics.ListAPIView):
+    serializer_class = HistorySerializer
+    permission_classes = (IsAuthenticated,)
+
+    def get_queryset(self):
+        user = get_object_or_404(Profile,email=self.request.user.email,)
+        history=History.objects.get_or_create(user=user)[0]
+        return History.objects.filter(user=user)
+
+    def get_serializer_context(self):
+        context = super(HistoryAPI, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
