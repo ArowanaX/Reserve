@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import ResidenceSerializer,LoginSerializer,AccountSerializer,VerificationCodeSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
+from .serializers import ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer
 from .models import Profile,Residence,ResidenceOutdoorAlbum
 import json
 
