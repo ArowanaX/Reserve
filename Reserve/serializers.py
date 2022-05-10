@@ -60,9 +60,12 @@ class ReservationSerializer(serializers.ModelSerializer):
             
         )
         reservation.save()
-        history=History.objects.get_or_create(user=reserver)[0]
-        history.reserve.add(reservation)
-        history.save()
+        history_user=History.objects.get_or_create(user=reserver)[0]
+        history_user.reserve.add(reservation)
+        history_user.save() 
+        history_sup=History.objects.get_or_create(user=to_hotel)[0]
+        history_sup.reserve.add(reservation)
+        history_sup.save()
 
         return reservation
 
@@ -157,12 +160,3 @@ class HistorySerializer(serializers.ModelSerializer):
             'reserver': {'read_only': True},
             'user': {'read_only': True},
         }
-    # def create(self, validated_data):
-    #     request = self.context["request"]
-    #     user = get_object_or_404(Profile,email=request.user.email,)
-    #     history=History.objects.get_or_create(user=user)[0]
-    #     res=validated_data['reserve'][0]
-    #     reserve= Reservation.objects.get(id=res.id)
-    #     history.reserve.add(reserve)
-    #     history.save()
-    #     return history
