@@ -18,7 +18,4 @@ urlpatterns = [
     path("delupcomming/",DelUpcommingAPI.as_view(),name="delupcomming"),
     path("history/",HistoryAPI.as_view(),name="history"),
 
-
-
-
 ]

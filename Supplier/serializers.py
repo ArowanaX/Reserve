@@ -12,7 +12,7 @@ from django.contrib.auth import login,authenticate
 from rest_framework import serializers
 
 
-from .models import Residence,ResidenceOutdoorAlbum,ResidenceIndoorAlbum
+from .models import Residence,ResidenceOutdoorAlbum,ResidenceIndoorAlbum, TickComment, Ticket
 from Customer.models import Profile
 
 
@@ -178,3 +178,75 @@ class Add_indoorimage_serializer(serializers.ModelSerializer):
         model = ResidenceIndoorAlbum
         fields ='__all__'
         extra_kwargs = {}
+
+class OpenTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields =  ('title','describtion','att_file')
+        extra_kwargs = {
+            'title': {'required': True},
+            'describtion': {'required': True},
+            'att_file': {'required': False},
+        }
+
+    def create(self, validated_data):
+        user= self.context["request"]
+        ticket = Ticket.objects.create(
+            title=validated_data['title'],
+            describtion=validated_data['describtion'],
+            att_file=validated_data['att_file'],
+            residence=user
+        )
+        ticket.save()
+        return ticket 
+
+
+class ShowTikSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields =  ('title','CommentToTicket')
+        extra_kwargs = {
+            'title': {'read_only': True,'label':"title"},
+            'CommentToTicket': {'read_only': True},
+        }
+        depth = 1
+        
+    def build_nested_field(self, field_name, relation_info, nested_depth):
+       
+        if field_name == 'CommentToTicket': 
+            field_class = NastedTicketserializer
+            field_kwargs = get_nested_relation_kwargs(relation_info)
+            return field_class, field_kwargs
+        return super().build_nested_field(field_name, relation_info, nested_depth)
+    
+
+
+
+class AddTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = TickComment
+        fields =  ('ticket','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'ticket': {'required': True,'label':"ticket"},
+        }
+    def create(self, validated_data):
+        ticket= validated_data['ticket']
+        print(self)
+        comment = TickComment.objects.create(
+            user=self.context["request"],
+            ticket=ticket,
+            comment=validated_data['comment'],
+        )
+        comment.save()
+        return comment 
+
+class NastedTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = TickComment
+        fields =  ('ticket','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'ticket': {'required': True,'label':"ticket"},
+        }
+        
