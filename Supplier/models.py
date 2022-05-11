@@ -127,3 +127,36 @@ class TickComment(models.Model):
     def __str__(self) -> str:
         return f"{self.user.last_name}"   
 
+
+class rate(models.Model):
+    user=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="RateToUser",verbose_name=_("user"))
+    hotel=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="RateToResidence",verbose_name=_("hotel"))
+    RATE_CHOICES=[
+        ("1","1"),
+        ("2","2"),
+        ("3","3"),
+        ("4","4"),
+        ("5","5")
+    ] 
+    rate=models.CharField(max_length=1,choices=RATE_CHOICES,verbose_name=_("rate"),help_text="امتیاز خود را وارد کنید",null=True,blank=True)
+
+    class Meta:
+        verbose_name="rate"
+        verbose_name_plural="rates"
+
+    def __str__(self) -> str:
+        return f"{self.user.last_name}_{self.hotel.name}"        
+
+
+class Comment(models.Model):
+    user=models.ForeignKey(Profile,null=True,on_delete=models.SET_NULL,related_name="commenttouser",verbose_name=_("user"))   
+    hotel=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="commenttohotel",verbose_name=_("hotel"))
+    comment=models.CharField(max_length=255,verbose_name=_("comment"),help_text="کامنت خود را وارد کنید",null=True,blank=True)
+
+    class Meta:
+        verbose_name="comment"
+        verbose_name_plural="comments"
+
+    def __str__(self) -> str:
+        return f"{self.user.last_name} To {self.hotel.residenceTOprofile}" 
+

@@ -12,8 +12,8 @@ from rest_framework.views import APIView
 from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import AddTicketserializer, OpenTicketserializer, ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer, ShowTikSerializer
-from .models import Profile,Residence,ResidenceOutdoorAlbum,Ticket,TickComment
+from .serializers import AddCommentserializer, AddRateserializer, AddTicketserializer, OpenTicketserializer, ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer, ShowCommentserializer, ShowRateserializer, ShowTikSerializer
+from .models import Profile,Residence,ResidenceOutdoorAlbum,Ticket,TickComment,Comment, rate
 import json
 
 
@@ -131,3 +131,60 @@ class AddTikComment(generics.CreateAPIView):
         ticket = get_object_or_404(Ticket,user=self.request.user,)
         return ticket
 
+class AddCommentAPI(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Profile.objects.all()
+    serializer_class = AddCommentserializer
+
+    def get_serializer_context(self):
+        context = super(AddCommentAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        hotel = Profile.objects.filter(is_Residence=True)
+        return hotel
+
+class ShowCommentAPI(generics.ListCreateAPIView):
+    queryset =  Comment.objects.all()
+    serializer_class = ShowCommentserializer
+
+    def get_serializer_context(self):
+        context = super(ShowCommentAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ShowCommentAPI(data=request.data['hotel'])
+        comment= Comment.objects.filter(hotel = request.data['hotel']).values_list()
+        print(comment)
+        return Response(comment)
+
+class AddRateAPI(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Profile.objects.all()
+    serializer_class = AddRateserializer
+
+    def get_serializer_context(self):
+        context = super(AddRateAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        hotel = Profile.objects.filter(is_Residence=True)
+        return hotel
+
+class ShowRateAPI(generics.ListCreateAPIView):
+    queryset =  rate.objects.all()
+    serializer_class = ShowRateserializer
+
+    def get_serializer_context(self):
+        context = super(ShowRateAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ShowRateAPI(data=request.data['hotel'])
+        my_rate= rate.objects.filter(hotel = request.data['hotel']).values_list()
+        print(my_rate)
+        return Response(my_rate)

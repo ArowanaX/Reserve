@@ -1,7 +1,5 @@
 from dataclasses import fields
-import email
-#from typing_extensions import Required
-#from typing_extensions import Self
+
 from django.contrib.auth.password_validation import validate_password
 from django.forms import CharField
 from pkg_resources import require
@@ -12,7 +10,7 @@ from django.contrib.auth import login,authenticate
 from rest_framework import serializers
 
 
-from .models import Residence,ResidenceOutdoorAlbum,ResidenceIndoorAlbum, TickComment, Ticket
+from .models import *
 from Customer.models import Profile
 
 
@@ -250,3 +248,65 @@ class NastedTicketserializer(serializers.ModelSerializer):
             'ticket': {'required': True,'label':"ticket"},
         }
         
+
+class AddCommentserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields =  ('hotel','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        comment= Comment.objects.create(
+            user=request,
+            hotel=validated_data['hotel'],
+            comment=validated_data['comment'],
+            )
+        comment.save()
+        return comment
+
+class ShowCommentserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields =  ('user','hotel','comment')
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'comment': {'read_only': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        return request
+
+class AddRateserializer(serializers.ModelSerializer):
+    class Meta:
+        model = rate
+        fields =  ('hotel','rate')
+        extra_kwargs = {
+            'rate': {'required': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        my_rate= rate.objects.create(
+            user=request,
+            hotel=validated_data['hotel'],
+            rate=validated_data['rate'],
+            )
+        my_rate.save()
+        return my_rate
+
+class ShowRateserializer(serializers.ModelSerializer):
+    class Meta:
+        model = rate
+        fields =  ('user','hotel','rate')
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'rate': {'read_only': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        return request
