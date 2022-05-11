@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from .models import *
 from pkg_resources import require
 from requests import delete, request
-from rest_framework import serializers
+from rest_framework import serializers,generics
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from Customer.models import Profile
 from Customer.serializers import UserSerializer
@@ -65,13 +65,41 @@ class ReservationSerializer(serializers.ModelSerializer):
         history_user=History.objects.get_or_create(user=reserver)[0]
         history_user.reserve.add(reservation)
         history_user.save() 
+        upcomming_user=Upcomming.objects.get_or_create(user=reserver)[0]
+        upcomming_user.reserve.add(reservation)
+        upcomming_user.save() 
         history_sup=History.objects.get_or_create(user=to_hotel)[0]
         history_sup.reserve.add(reservation)
         history_sup.save()
         # send_mail()
-        Send_sms(to_hotel.phone,reservation,"notif")
-
+        # Send_sms(to_hotel.phone,reservation,"notif")
         return reservation
+
+class DelReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reservation
+        fields = ('id','reserver','hotel','date_in','date_out','person_num','type_room','request_user','offers','news','sms')
+        extra_kwargs = {
+            'id': {'required': True,'read_only': False},
+            'reserver': {'read_only': True},
+            'hotel': {'read_only': True},
+            'order_date': {'read_only': True},
+            'date_in': {'read_only': True},
+            'date_out': {'read_only': True},
+            'person_num': {'read_only': True},
+            'type_room': {'read_only': True},
+            'request_user': {'read_only': True},
+            'offers': {'read_only': True},
+            'news': {'read_only': True},
+            'sms': {'read_only': True},
+        }
+    def create(self, validated_data):
+        request = self.context["request"]
+        user = get_object_or_404(Profile,email=request.email,)
+        reserve= Reservation.objects.get(id=validated_data["id"])
+        reserve.delete()
+        return reserve
+
 
 class WishlistSerializer(serializers.ModelSerializer):
     class Meta:
