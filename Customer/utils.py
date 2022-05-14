@@ -26,6 +26,10 @@ def Send_sms(phone,uid,opt):
             text = 'کد تاییدیه شما از طرف هوگامان'+' '+ uid
         if opt=="inv":
             text = 'شما به هتل ما دعوت شدید'+ uid
+        if opt=="notif":
+            date = uid.date_in
+            text = 'ثبت رزرو جدید باتاریخ ورود '+ date
+        print("Emailllllllllllllll")
         print(text)
         # response = sms.send(to,_from,text)
         # print(response)

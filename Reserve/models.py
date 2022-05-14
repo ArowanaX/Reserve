@@ -15,7 +15,7 @@ class CustomBooleanField(models.BooleanField):
 
 class Reservation(models.Model):
     
-    id = models.CharField(max_length=30, primary_key=True, default=uuid.uuid4, editable=False)
+    # id = models.BigAutoField(primary_key=True,null=False,blank=False)
     order_date = models.DateField(auto_now_add=True,null=True,blank=True)
     date_in = models.DateField(null=True,blank=True)
     date_out = models.DateField(null=True,blank=True)

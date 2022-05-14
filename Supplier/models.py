@@ -1,4 +1,4 @@
-import email
+
 from django.db import models
 from django.utils.translation import gettext as _
 from django.contrib.auth.password_validation import validate_password
@@ -94,3 +94,69 @@ class RestaurantMenu(models.Model):
     describtion = models.TextField(null=True,blank=True)
     price = models.FloatField(null=True,blank=True)
     service = models.ForeignKey(Service,on_delete=models.CASCADE,related_name="menuTOservice")
+
+
+class Ticket(models.Model):
+    title = models.CharField(max_length=30,null=False,blank=False)
+    describtion = models.TextField(null=True,blank=True)
+    att_file = models.FileField(upload_to = "supplier/ticket",null=True,blank=True)
+    create_date = models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
+    status = models.BooleanField(default=True)
+    residence = models.ForeignKey(Profile,on_delete=models.DO_NOTHING,related_name="TickToResidence")
+    admin = models.ManyToManyField(Profile,blank=True)
+
+    class Meta:
+        verbose_name="Ticket"
+        verbose_name_plural="Tickets"
+
+    def __str__(self) -> str:
+        return self.title  
+
+
+class TickComment(models.Model):
+
+    user=models.ForeignKey(Profile,null=True,on_delete=models.SET_NULL,related_name="CommentToUser",verbose_name=_("UserToTikComment"))   
+    ticket=models.ForeignKey(Ticket,on_delete=models.CASCADE,related_name="CommentToTicket",verbose_name=_("TickToTikComment"))
+
+    comment=models.CharField(max_length=255,verbose_name=_("comment"),help_text="کامنت خود را وارد کنید",null=True,blank=True)
+
+    class Meta:
+        verbose_name="TikComment"
+        verbose_name_plural="TikComments"
+
+    def __str__(self) -> str:
+        return f"{self.user.last_name}"   
+
+
+class rate(models.Model):
+    user=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="RateToUser",verbose_name=_("user"))
+    hotel=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="RateToResidence",verbose_name=_("hotel"))
+    RATE_CHOICES=[
+        ("1","1"),
+        ("2","2"),
+        ("3","3"),
+        ("4","4"),
+        ("5","5")
+    ] 
+    rate=models.CharField(max_length=1,choices=RATE_CHOICES,verbose_name=_("rate"),help_text="امتیاز خود را وارد کنید",null=True,blank=True)
+
+    class Meta:
+        verbose_name="rate"
+        verbose_name_plural="rates"
+
+    def __str__(self) -> str:
+        return f"{self.user.last_name}_{self.hotel.name}"        
+
+
+class Comment(models.Model):
+    user=models.ForeignKey(Profile,null=True,on_delete=models.SET_NULL,related_name="commenttouser",verbose_name=_("user"))   
+    hotel=models.ForeignKey(Profile,on_delete=models.CASCADE,related_name="commenttohotel",verbose_name=_("hotel"))
+    comment=models.CharField(max_length=255,verbose_name=_("comment"),help_text="کامنت خود را وارد کنید",null=True,blank=True)
+
+    class Meta:
+        verbose_name="comment"
+        verbose_name_plural="comments"
+
+    def __str__(self) -> str:
+        return f"{self.user.last_name} To {self.hotel.residenceTOprofile}" 
+
