@@ -1,11 +1,13 @@
 
+from email.policy import default
 from django.db import models
 from django.utils.translation import gettext as _
 from django.contrib.auth.password_validation import validate_password
 
+# from location_field.forms.plain import PlainLocationField
 
 from Customer.models import Profile
-
+from location_field.models.plain import PlainLocationField
 
     
 #---------------------------------Residence(hotel)----------------------
@@ -44,6 +46,7 @@ class Residence(models.Model):
     detail = models.TextField(max_length=300,null=True,blank=True)
     # email =models.EmailField('email address')
     phone = models.CharField(max_length=12,unique=True,verbose_name="phone")
+    location = PlainLocationField(based_fields=['city'], zoom=7,default=(35.687417812220446,51.37945175170898))
 
 
     def __str__(self):

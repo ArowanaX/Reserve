@@ -18,9 +18,11 @@ from Customer.models import Profile
 
 
 class ResidenceSerializer(serializers.ModelSerializer):
+    # location = serializers.ListField(child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2)
+
     class Meta:
         model = Residence
-        fields =  ('name','city','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','phone')
+        fields =  ('name','city','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','phone','location',)
         
         extra_kwargs = {
             'name': {'required': True},
@@ -45,6 +47,7 @@ class ResidenceRegisterSerializer(serializers.ModelSerializer):
     re_password = serializers.CharField(write_only=True, required=True)
     
     class Meta:
+
         model = Profile
         fields = ('first_name','last_name','email','residenceTOprofile','password','re_password')
         extra_kwargs = {
@@ -80,6 +83,24 @@ class ResidenceRegisterSerializer(serializers.ModelSerializer):
         return attrs
     
 
+# class LocationSerializer(serializers.Serializer):
+#     location = serializers.ListField(child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2)
+    
+#     def create(self, validated_data):
+#         validated_data['location_point'] = Point(validated_data.pop('location'))
+#         location = Location(**validated_data)
+#         location.save()
+#         return location
+        
+#     def update(self, instance, validated_data):
+#         if validated_data.get('location'):
+#             instance.location_point = Point(validated_data.pop('location'))
+#         return instance
+
+#     def to_representation(self, instance):
+#         instance.location = json.loads(instance.location_point.geojson)['coordinates']
+#         instance = super().to_representation(instance)
+#         return instance
 #--------------------------------------residence login with password & name---------------
 
 class LoginSerializer(serializers.ModelSerializer):

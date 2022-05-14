@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django_social_share',
+    'location_field.apps.DefaultConfig'
 ]
 
 MIDDLEWARE = [
@@ -196,3 +197,14 @@ EMAIL_HOST_PASSWORD = '09137217213'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+LOCATION_FIELD = {
+    'map.provider': 'openstreetmap',
+    'map.zoom': 15,
+
+    'search.provider': 'google',
+    'search.suffix': '',
+    
+    'provider.openstreetmap.max_zoom': 18,
+}
