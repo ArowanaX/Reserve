@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'django_social_share',
-    'location_field.apps.DefaultConfig'
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [

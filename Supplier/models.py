@@ -9,8 +9,8 @@ from django.contrib.auth.password_validation import validate_password
 
 import uuid
 
-
 from Customer.models import Profile
+from location_field.models.plain import PlainLocationField
 
 #---------------------------------Tags(hotel)----------------------
 
@@ -41,8 +41,8 @@ class Category(models.Model):
 
 # from location_field.forms.plain import PlainLocationField
 
-from Customer.models import Profile
-from location_field.models.plain import PlainLocationField
+#rom Customer.models import Profile
+#from location_field.models.plain import PlainLocationField
 
     
 #---------------------------------Residence(hotel)----------------------
