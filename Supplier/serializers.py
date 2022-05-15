@@ -3,6 +3,7 @@ import email
 from turtle import update
 #from typing_extensions import Required
 #from typing_extensions import Self
+
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.hashers import make_password
 from django.forms import CharField
@@ -16,6 +17,7 @@ from rest_framework import serializers
 
 
 from .models import Residence,ResidenceOutdoorAlbum,ResidenceIndoorAlbum, Service, RestaurantMenu
+from .models import *
 from Customer.models import Profile
 
 
@@ -23,9 +25,11 @@ from Customer.models import Profile
 
 
 class ResidenceSerializer(serializers.ModelSerializer):
+    # location = serializers.ListField(child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2)
+
     class Meta:
         model = Residence
-        fields =  ('name','city','address','img','type','service_hours_start','service_hours_end','max_reserve','detail','phone')
+        fields =  ('name','city','address','img','type','tag','service_hours_start','service_hours_end','max_reserve','detail','phone','location',)
         
         extra_kwargs = {
             'name': {'required': True},
@@ -50,6 +54,7 @@ class ResidenceRegisterSerializer(serializers.ModelSerializer):
     re_password = serializers.CharField(write_only=True, required=True)
     
     class Meta:
+
         model = Profile
         fields = ('first_name','last_name','email','residenceTOprofile','password','re_password')
         extra_kwargs = {
@@ -85,6 +90,24 @@ class ResidenceRegisterSerializer(serializers.ModelSerializer):
         return attrs
     
 
+# class LocationSerializer(serializers.Serializer):
+#     location = serializers.ListField(child=serializers.DecimalField(max_digits=7, decimal_places=5), max_length=2, min_length=2)
+    
+#     def create(self, validated_data):
+#         validated_data['location_point'] = Point(validated_data.pop('location'))
+#         location = Location(**validated_data)
+#         location.save()
+#         return location
+        
+#     def update(self, instance, validated_data):
+#         if validated_data.get('location'):
+#             instance.location_point = Point(validated_data.pop('location'))
+#         return instance
+
+#     def to_representation(self, instance):
+#         instance.location = json.loads(instance.location_point.geojson)['coordinates']
+#         instance = super().to_representation(instance)
+#         return instance
 #--------------------------------------residence login with password & name---------------
 
 class LoginSerializer(serializers.ModelSerializer):
@@ -403,3 +426,139 @@ class Delete_indoorimage_serializer(serializers.ModelSerializer):
             'img_indoor': {'read_only':False},
             'id': {'read_only': True},
         }
+        fields ='__all__'
+        extra_kwargs = {}
+
+class OpenTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields =  ('title','describtion','att_file')
+        extra_kwargs = {
+            'title': {'required': True},
+            'describtion': {'required': True},
+            'att_file': {'required': False},
+        }
+
+    def create(self, validated_data):
+        user= self.context["request"]
+        ticket = Ticket.objects.create(
+            title=validated_data['title'],
+            describtion=validated_data['describtion'],
+            att_file=validated_data['att_file'],
+            residence=user
+        )
+        ticket.save()
+        return ticket 
+
+
+class ShowTikSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields =  ('title','CommentToTicket')
+        extra_kwargs = {
+            'title': {'read_only': True,'label':"title"},
+            'CommentToTicket': {'read_only': True},
+        }
+        depth = 1
+        
+    def build_nested_field(self, field_name, relation_info, nested_depth):
+       
+        if field_name == 'CommentToTicket': 
+            field_class = NastedTicketserializer
+            field_kwargs = get_nested_relation_kwargs(relation_info)
+            return field_class, field_kwargs
+        return super().build_nested_field(field_name, relation_info, nested_depth)
+    
+
+
+
+class AddTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = TickComment
+        fields =  ('ticket','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'ticket': {'required': True,'label':"ticket"},
+        }
+    def create(self, validated_data):
+        ticket= validated_data['ticket']
+        print(self)
+        comment = TickComment.objects.create(
+            user=self.context["request"],
+            ticket=ticket,
+            comment=validated_data['comment'],
+        )
+        comment.save()
+        return comment 
+
+class NastedTicketserializer(serializers.ModelSerializer):
+    class Meta:
+        model = TickComment
+        fields =  ('ticket','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'ticket': {'required': True,'label':"ticket"},
+        }
+        
+
+class AddCommentserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields =  ('hotel','comment')
+        extra_kwargs = {
+            'comment': {'required': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        comment= Comment.objects.create(
+            user=request,
+            hotel=validated_data['hotel'],
+            comment=validated_data['comment'],
+            )
+        comment.save()
+        return comment
+
+class ShowCommentserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields =  ('user','hotel','comment')
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'comment': {'read_only': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        return request
+
+class AddRateserializer(serializers.ModelSerializer):
+    class Meta:
+        model = rate
+        fields =  ('hotel','rate')
+        extra_kwargs = {
+            'rate': {'required': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        my_rate= rate.objects.create(
+            user=request,
+            hotel=validated_data['hotel'],
+            rate=validated_data['rate'],
+            )
+        my_rate.save()
+        return my_rate
+
+class ShowRateserializer(serializers.ModelSerializer):
+    class Meta:
+        model = rate
+        fields =  ('user','hotel','rate')
+        extra_kwargs = {
+            'user': {'read_only': True},
+            'rate': {'read_only': True},
+            'hotel': {'required': True},
+        }
+    def create(self, validated_data):
+        request = self.context['request']
+        return request

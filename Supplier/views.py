@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.shortcuts import redirect,HttpResponse
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
 from rest_framework import generics,status
@@ -22,6 +23,8 @@ from .models import Profile,Residence,Service,RestaurantMenu,ResidenceOutdoorAlb
 
 from Reserve.utils import send_mail
 
+from .serializers import AddCommentserializer, AddRateserializer, AddTicketserializer, OpenTicketserializer, ResidenceSerializer,LoginSerializer,AccountSerializer,Add_indoorimage_serializer,Add_outdoorimage_serializer,ResidenceRegisterSerializer, ShowCommentserializer, ShowRateserializer, ShowTikSerializer
+from .models import Profile,Residence,ResidenceOutdoorAlbum,Ticket,TickComment,Comment, rate
 import json
 import random
 
@@ -310,3 +313,101 @@ class AddINImageAlbumUpdateAPIView(generics.DestroyAPIView):
         indoor_id = self.kwargs['id']
         indoor_img = ResidenceIndoorAlbum.objects.filter(id=indoor_id)
         return indoor_img
+    lookup_field = 'residence'
+
+class OpenTicketAPI(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Ticket.objects.all()
+    serializer_class = OpenTicketserializer
+
+    def get_serializer_context(self):
+        context = super(OpenTicketAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+class ShowTicketAPI(generics.ListCreateAPIView):
+    queryset = Ticket.objects.all()
+    serializer_class = ShowTikSerializer
+    permission_classes = (IsAuthenticated,)
+    
+    def get_serializer_context(self):
+        context = super(ShowTicketAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        user = get_object_or_404(Profile,email=self.request.user.email,)
+        return Ticket.objects.filter(residence=user)
+
+
+class AddTikComment(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Ticket.objects.all()
+    serializer_class = AddTicketserializer
+
+    def get_serializer_context(self):
+        context = super(AddTikComment, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        ticket = get_object_or_404(Ticket,user=self.request.user,)
+        return ticket
+
+class AddCommentAPI(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Profile.objects.all()
+    serializer_class = AddCommentserializer
+
+    def get_serializer_context(self):
+        context = super(AddCommentAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        hotel = Profile.objects.filter(is_Residence=True)
+        return hotel
+
+class ShowCommentAPI(generics.ListCreateAPIView):
+    queryset =  Comment.objects.all()
+    serializer_class = ShowCommentserializer
+
+    def get_serializer_context(self):
+        context = super(ShowCommentAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ShowCommentAPI(data=request.data['hotel'])
+        comment= Comment.objects.filter(hotel = request.data['hotel']).values_list()
+        print(comment)
+        return Response(comment)
+
+class AddRateAPI(generics.CreateAPIView):
+    permission_classes = (IsAuthenticated,)
+    queryset =  Profile.objects.all()
+    serializer_class = AddRateserializer
+
+    def get_serializer_context(self):
+        context = super(AddRateAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+
+    def get_queryset(self):
+        hotel = Profile.objects.filter(is_Residence=True)
+        return hotel
+
+class ShowRateAPI(generics.ListCreateAPIView):
+    queryset =  rate.objects.all()
+    serializer_class = ShowRateserializer
+
+    def get_serializer_context(self):
+        context = super(ShowRateAPI, self).get_serializer_context()
+        context.update({"request": self.request.user})
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        serializer = ShowRateAPI(data=request.data['hotel'])
+        my_rate= rate.objects.filter(hotel = request.data['hotel']).values_list()
+        print(my_rate)
+        return Response(my_rate)

@@ -4,6 +4,8 @@ from .views import (ResidenceRegisterAPI,LoginAPIView,AccountAPIView,EmailVerifi
                     ServiceListAPIView,ServiceCreateAPIView,ServiceUpdateAPIView,MenuListAPIView,MenuCreateAPIView,
                     MenuUpdateAPIView,AddINImageAlbumListAPIView,AddINImageAlbumCreateAPIView,AddINImageAlbumUpdateAPIView,
                     AddOUTImageAlbumListAPIView,AddOUTImageAlbumCreateAPIView,AddOUTImageAlbumUpdateAPIView)
+# from .views import ResidenceAPI,LoginAPIView,AccountAPIView,AddOUTImageAlbum,AddINImageAlbum,ResidenceRegisterAPI
+from .views import *
 
 app_name="Supplier"
 
@@ -28,4 +30,14 @@ urlpatterns = [
     path("outimg_list/",AddOUTImageAlbumListAPIView.as_view(),name="add_outimage_list"),
     path("outimg_create/",AddOUTImageAlbumCreateAPIView.as_view(),name="add_outimage_create"),
     path("outimg_delete/<str:residence>/<int:id>",AddOUTImageAlbumUpdateAPIView.as_view(),name="add_outimage_update"),
+    path("openticket/",OpenTicketAPI.as_view(),name="openticket"),
+    path("tikcomment/",AddTikComment.as_view(),name="tikcomment"),
+    path("showticket/",ShowTicketAPI.as_view(),name="showticket"),
+    path("addcomment/",AddCommentAPI.as_view(),name="addcomment"),
+    path("showcomment/",ShowCommentAPI.as_view(),name="showcomment"),
+    path("addrate/",AddRateAPI.as_view(),name="addrate"),
+    path("Showrate/",ShowRateAPI.as_view(),name="Showrate"),
+
+    
+
 ]
