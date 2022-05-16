@@ -8,7 +8,8 @@ urlpatterns = [
     path("Customer/", include("Customer.urls", namespace='customer')),
     path("Reserve/", include("Reserve.urls", namespace='reserve')),
     path("Supplier/", include("Supplier.urls", namespace='supplier')),
+    path("BigAdmin/", include("BigAdmin.urls", namespace='BigAdmin')),
     path("type",UserType.as_view(),name="type"),
-    # path("Reservation/",include("Reserve.urls", namespace='reservation')),
+    path("Reservation/",include("Reserve.urls", namespace='reservation')),
 
 ]

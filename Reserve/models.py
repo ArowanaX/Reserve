@@ -15,7 +15,7 @@ class CustomBooleanField(models.BooleanField):
 
 class Reservation(models.Model):
     
-    id = models.CharField(max_length=30, primary_key=True, default=uuid.uuid4, editable=False)
+    # id = models.BigAutoField(primary_key=True,null=False,blank=False)
     order_date = models.DateField(auto_now_add=True,null=True,blank=True)
     date_in = models.DateField(null=True,blank=True)
     date_out = models.DateField(null=True,blank=True)
@@ -39,38 +39,48 @@ class Reservation(models.Model):
     
 
     def __str__(self):
-        return self.id
+        # return self.hotel+ self.reserver
+        return f'{self.hotel} _ {self.reserver}'
     
     class Meta:
         db_table = 'reservation'
 
 class Wishlist(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="wishlisttocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    residence=models.ManyToManyField(Residence,related_name="wishlisttoresidence")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
         verbose_name = "Wishlist"
         verbose_name_plural = "Wishlists"
+        db_table = 'Wishlist'
 
     def __str__(self):
-        return str(self.user.last_name)
+        return str(self.user.email)
 
 class Upcomming(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="upcommingtocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    # residence=models.ManyToManyField(Residence,related_name="upcommingtoresidence")
+    reserve=models.ManyToManyField(Reservation,related_name="upcommingtoreserve")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
         verbose_name = "Upcomming"
         verbose_name_plural = "Upcommings"
+        db_table = 'upcomming'
 
+    def __str__(self):
+        return str(self.user.email)
 
 class History(models.Model):
     user=models.ForeignKey(Profile,on_delete=models.CASCADE, related_name="historytocustomer")
-    reserve=models.ManyToManyField(Reservation)
+    reserve=models.ManyToManyField(Reservation,related_name="historytoreserve")
     # datetime =models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
 
     class Meta:
         verbose_name = "History"
         verbose_name_plural = "History"
+        db_table = 'History'
+
+    def __str__(self):
+        return str(self.user.email)

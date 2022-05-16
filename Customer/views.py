@@ -12,6 +12,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics,status
 
+# from Reserve.views import AddToUpcomming
+
 from .serializers import *
 from .models import *
 import random
@@ -36,6 +38,12 @@ class UserType(generics.CreateAPIView):
 
 
 #------------------------------------set activation code and send sms----------------------
+# def inv(request,valid):
+#     RandID=str(random.randint(100000,999999))
+#     cache.set(RandID,valid,180)
+#     PhoneVerifi.as_view()(request)
+#     AddToUpcomming.as_view()(request,RandID)
+
 
 class PhoneVerifi(generics.CreateAPIView):
  
@@ -118,14 +126,14 @@ class UserAccontAPI(generics.RetrieveUpdateAPIView):
         self.perform_update(serializer)
 
         if getattr(instance, '_prefetched_objects_cache', None):
-            # If 'prefetch_related' has been applied to a queryset, we need to
-            # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
         return Response(serializer.data)
     
     def get_serializer_context(self):
         context = super(UserAccontAPI, self).get_serializer_context()
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+        print(self.request.user)
         context.update({"request": self.request.user})
         return context
 
@@ -153,4 +161,11 @@ class RecoverUserAPI(generics.CreateAPIView):
         return context
 
 
+class InviteLink(generics.CreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ChoiseSerializer
 
+    def get_serializer_context(self):
+        context = super(InviteLink, self).get_serializer_context()
+        context.update({"res_id": self.kwargs["res_id"]})
+        return context

@@ -35,12 +35,14 @@ INSTALLED_APPS = [
     'Customer',
     'Supplier',
     'Reserve',
+    'BigAdmin',
 
     # 'django_celery_results',
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
     'django_social_share',
+    'location_field.apps.DefaultConfig',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -179,10 +182,31 @@ CACHES = {
 
 
 
-
+# CELERY Config
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_TIMEZONE = "Asia/Tehran"
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_CACHE_BACKEND = 'default'
 CELERY_RESULT_SERIALIZER = 'json'
+
+
+# SMTP Mail service with decouple
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = 'maryamnadeali6989@yahoo.com'
+EMAIL_HOST_PASSWORD = '09137217213'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+LOCATION_FIELD = {
+    'map.provider': 'openstreetmap',
+    'map.zoom': 15,
+
+    'search.provider': 'google',
+    'search.suffix': '',
+    
+    'provider.openstreetmap.max_zoom': 18,
+}
