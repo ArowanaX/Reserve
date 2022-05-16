@@ -176,13 +176,14 @@ class ResidenceIndoorAlbum(models.Model):
 
 
 class Ticket(models.Model):
+    id = models.BigAutoField(auto_created=True, primary_key=True)
     title = models.CharField(max_length=30,null=False,blank=False)
     describtion = models.TextField(null=True,blank=True)
     att_file = models.FileField(upload_to = "supplier/ticket",null=True,blank=True)
     create_date = models.DateTimeField(auto_now=True,verbose_name=_('date and time'))
     status = models.BooleanField(default=True)
     residence = models.ForeignKey(Profile,on_delete=models.DO_NOTHING,related_name="TickToResidence")
-    admin = models.ManyToManyField(Profile,blank=True)
+    admin = models.ForeignKey(Profile,on_delete=models.DO_NOTHING,blank=True)
 
     class Meta:
         verbose_name="Ticket"
