@@ -132,6 +132,8 @@ class UserAccontAPI(generics.RetrieveUpdateAPIView):
     
     def get_serializer_context(self):
         context = super(UserAccontAPI, self).get_serializer_context()
+        print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+        print(self.request.user)
         context.update({"request": self.request.user})
         return context
 

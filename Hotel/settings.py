@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'Customer',
     'Supplier',
     'Reserve',
+    'BigAdmin',
 
     # 'django_celery_results',
     'rest_framework',
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
